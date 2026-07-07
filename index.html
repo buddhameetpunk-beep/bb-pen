@@ -774,15 +774,15 @@ body.pen-mode-active * {
 
       .language-options {
         position: absolute;
-        right: calc(100% + 10px);
+        right: calc(100% + 3px);
         bottom: 0;
         display: flex;
         flex-direction: row;
         align-items: center;
-        gap: 8px;
+        gap: 0px;
         opacity: 0;
         pointer-events: none;
-        transform: translateX(12px);
+        transform: translateX(8px);
         transition:
           opacity 0.2s ease,
           transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
@@ -795,8 +795,8 @@ body.pen-mode-active * {
       }
 
       .language-button {
-        width: 58px;
-        height: 58px;
+        width: 42px;
+        height: 42px;
       }
 
       .about-art {
@@ -828,10 +828,51 @@ body.pen-mode-active * {
 
       .logo-wrap {
         top: 3vw;
+        z-index: 10040;
+      }
+
+      #drawCanvas {
+        z-index: 199998;
+      }
+
+      .pen-wrap,
+      .pen-wrap.is-selected,
+      .home.pen-mode .pen-wrap {
+        z-index: 199999;
+      }
+
+      .about-ui {
+        z-index: 10050;
+      }
+
+      .about-panel {
+        z-index: 10030;
+      }
+
+      .language-switch,
+      .home.about-open .language-switch {
+        z-index: 10060;
+      }
+
+      .about-close {
+        z-index: 10070;
       }
 
       .logo {
         width: 94vw;
+      }
+
+      /* Mobile ABOUT opens like a new sheet from the top.
+         Hide the fixed logo and question icon while the sheet is open,
+         then start the title near the top with a safe margin. */
+      .home.about-open .logo-wrap,
+      .home.about-open .about-ui {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .home.about-open .about-content {
+        padding-top: max(34px, calc(env(safe-area-inset-top) + 28px));
       }
 
       .hand-wrap {
@@ -885,7 +926,7 @@ body.pen-mode-active * {
         width: 100vw;
         height: 100dvh;
         max-height: none;
-        z-index: 40;
+        z-index: 10030;
         background: #ffffff;
         transform: translateY(-105%);
         opacity: 0;
@@ -897,23 +938,23 @@ body.pen-mode-active * {
       }
 
       .about-content {
-        padding: 96px 22px 118px;
+        padding: max(34px, calc(env(safe-area-inset-top) + 28px)) 22px 118px;
         text-align: left;
       }
 
-.about-title {
-  display: block;
-  text-align: left;
-  border-bottom: 2px solid #000000;
-  padding-bottom: 14px;
-  margin-bottom: 24px;
+      .about-title {
+        display: block;
+        text-align: left;
+        border-bottom: 2px solid #000000;
+        padding-bottom: 14px;
+        margin: 0 56px 24px 0;
 
-  font-size: clamp(42px, 14vw, 72px);
-  line-height: 0.86;
-  letter-spacing: -0.07em;
-  font-weight: 400;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-}
+        font-size: clamp(42px, 14vw, 72px);
+        line-height: 0.86;
+        letter-spacing: -0.07em;
+        font-weight: 400;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      }
 
       .home.lang-jp .about-content,
       .home.lang-cn .about-content {
@@ -927,6 +968,7 @@ body.pen-mode-active * {
 
       .home.lang-ar .about-title {
         text-align: right;
+        margin: 0 0 24px 56px;
       }
 
       .about-content p {
@@ -970,9 +1012,11 @@ body.pen-mode-active * {
       .mobile-shop-label {
         display: block;
         margin-bottom: 7px;
-        font-size: 12px;
-        line-height: 1;
+        font-size: clamp(18px, 5vw, 24px);
+        line-height: 1.46;
         letter-spacing: -0.04em;
+        font-weight: 400;
+        color: #000000;
       }
 
       .mobile-shop-address {
@@ -1003,13 +1047,13 @@ body.pen-mode-active * {
       }
 
       .language-toggle {
-        width: 56px;
-        height: 56px;
+        width: 52px;
+        height: 52px;
       }
 
       .language-button {
-        width: 56px;
-        height: 56px;
+        width: 42px;
+        height: 42px;
       }
     }
 
@@ -1378,7 +1422,7 @@ B&B Tokyo Jingumae Shop
 
     const ABOUT_ROTATE_START = 1280;
     const ABOUT_ROTATE_END = 760;
-    const ABOUT_VERTICAL_THRESHOLD = 60 / 90;
+    const ABOUT_VERTICAL_THRESHOLD = 45 / 90;
 
     [
       "home01.png",
@@ -2009,8 +2053,13 @@ khepriButton.addEventListener("click", async (event) => {
       document.body.classList.add("pen-mode-active");
       penWrap.classList.add("is-selected");
 
-      /* 拿起笔后，先收起可能打开的 UI，避免和画笔冲突 */
-      closeAbout();
+      /* 拿起笔后通常收起可能打开的 UI；但手机端 about 打开时，保留文本，让用户可以在上面乱涂乱画 */
+      const keepMobileAboutOpen = window.innerWidth <= 700 && home.classList.contains("about-open");
+
+      if (!keepMobileAboutOpen) {
+        closeAbout();
+      }
+
       languageSwitch.classList.remove("is-open");
 
       /* 笔被拿起的瞬间，笔尖立刻取代鼠标位置 */
