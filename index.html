@@ -489,6 +489,14 @@
       display: block;
     }
 
+    .khepri-button.is-stage-two .khepri-img-normal {
+  display: none;
+}
+
+.khepri-button.is-stage-two .khepri-img-hover {
+  display: block;
+}
+
     .khepri-button.is-copied .khepri-img-normal,
     .khepri-button.is-copied .khepri-img-hover {
       display: none;
@@ -832,8 +840,8 @@
       .pen-wrap,
       .home.guide-complete .pen-wrap {
         left: 50vw;
-        height: 70vh;
-        top: 56vh;
+        height: 68vh;
+        top: 51vh;
       }
 
       .about-ui {
@@ -1331,6 +1339,8 @@ B&B Tokyo Jingumae Shop
 
     let khepriCopiedTimer = null;
 
+    let khepriMobileStage = 0;
+
     const moveThreshold = 5;
     const tipOffsetRatio = 0.44;
 
@@ -1617,8 +1627,9 @@ B&B Tokyo Jingumae Shop
       manualHandMode = false;
       setHandFrame(1);
 
-      clearTimeout(khepriCopiedTimer);
-      khepriButton.classList.remove("is-copied", "force-normal");
+     clearTimeout(khepriCopiedTimer);
+khepriMobileStage = 0;
+khepriButton.classList.remove("is-copied", "is-stage-two", "force-normal");
 
       updateGuide();
       resizeCanvas();
@@ -1672,26 +1683,58 @@ B&B Tokyo Jingumae Shop
       khepriButton.classList.remove("force-normal");
     });
 
-    khepriButton.addEventListener("click", async (event) => {
-        if (isSelected) {
-  event.preventDefault();
+khepriButton.addEventListener("click", async (event) => {
   event.stopPropagation();
-  return;
-}
-      event.stopPropagation();
 
-      clearTimeout(khepriCopiedTimer);
+  clearTimeout(khepriCopiedTimer);
 
-      khepriButton.classList.remove("force-normal");
-      khepriButton.classList.add("is-copied");
+  khepriButton.classList.remove("force-normal");
 
-      await copyAddresses();
+  /*
+    手机横屏 / 被压扁状态限定：
+    第一次点：01 → 02
+    第二次点：02 → 03，复制地址，3秒后回到01
+  */
+  if (isFlatLayout()) {
+    if (khepriMobileStage === 0) {
+      khepriMobileStage = 1;
 
-      khepriCopiedTimer = setTimeout(() => {
-        khepriButton.classList.remove("is-copied");
-        khepriButton.classList.add("force-normal");
-      }, 3000);
-    });
+      khepriButton.classList.remove("is-copied");
+      khepriButton.classList.add("is-stage-two");
+
+      return;
+    }
+
+    khepriMobileStage = 0;
+
+    khepriButton.classList.remove("is-stage-two");
+    khepriButton.classList.add("is-copied");
+
+    await copyAddresses();
+
+    khepriCopiedTimer = setTimeout(() => {
+      khepriButton.classList.remove("is-copied", "is-stage-two");
+    }, 3000);
+
+    return;
+  }
+
+  /*
+    宽屏 / 普通桌面状态：
+    保持原来的逻辑，点击直接 03，复制地址，3秒后回到01
+  */
+  khepriMobileStage = 0;
+
+  khepriButton.classList.remove("is-stage-two");
+  khepriButton.classList.add("is-copied");
+
+  await copyAddresses();
+
+  khepriCopiedTimer = setTimeout(() => {
+    khepriButton.classList.remove("is-copied");
+    khepriButton.classList.add("force-normal");
+  }, 3000);
+});
 
     handWrap.addEventListener("pointerdown", (event) => {
       if (!home.classList.contains("guide-complete")) return;
