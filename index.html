@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -63,12 +64,20 @@
   pointer-events: none !important;
 }
 
+
+html.pen-mode-active,
+html.pen-mode-active *,
+body.pen-mode-active,
+body.pen-mode-active * {
+  cursor: none !important;
+}
+
     #drawCanvas {
       position: fixed;
       inset: 0;
       width: 100vw;
       height: 100vh;
-      z-index: 1;
+      z-index: 9998;
       pointer-events: none;
     }
 
@@ -481,29 +490,32 @@
       display: none;
     }
 
-    .khepri-button:hover .khepri-img-normal {
-      display: none;
+    @media (hover: hover) and (pointer: fine) {
+      .khepri-button:hover .khepri-img-normal {
+        display: none;
+      }
+
+      .khepri-button:hover .khepri-img-hover {
+        display: block;
+      }
     }
 
-    .khepri-button:hover .khepri-img-hover {
-      display: block;
+    .khepri-button.is-stage-two .khepri-img-normal,
+    .khepri-button.is-stage-two .khepri-img-copied {
+      display: none !important;
     }
 
-    .khepri-button.is-stage-two .khepri-img-normal {
-  display: none;
-}
-
-.khepri-button.is-stage-two .khepri-img-hover {
-  display: block;
-}
+    .khepri-button.is-stage-two .khepri-img-hover {
+      display: block !important;
+    }
 
     .khepri-button.is-copied .khepri-img-normal,
     .khepri-button.is-copied .khepri-img-hover {
-      display: none;
+      display: none !important;
     }
 
     .khepri-button.is-copied .khepri-img-copied {
-      display: block;
+      display: block !important;
     }
 
     .khepri-button.force-normal .khepri-img-normal {
@@ -624,7 +636,7 @@
       left: 50vw;
       top: 74vh;
       height: 120vh;
-      z-index: 20;
+      z-index: 9999;
       transform: translate(-50%, -50%) rotate(var(--pen-rest-rotation));
       transform-origin: 50% 50%;
       transition:
@@ -633,6 +645,7 @@
         top 0.18s ease,
         height 0.18s ease;
       will-change: left, top, transform;
+      pointer-events: auto;
     }
 
     .home.guide-complete .pen-wrap {
@@ -642,9 +655,14 @@
     }
 
     .pen-wrap.is-selected {
+      z-index: 99999;
       transform: translate(-50%, -50%) rotate(var(--pen-selected-rotation));
       transition: none;
       pointer-events: none;
+    }
+
+    .home.pen-mode .pen-wrap {
+      z-index: 99999;
     }
 
     .pen {
@@ -657,31 +675,35 @@
     .press-area {
       position: absolute;
       top: 0;
-      left: 35%;
-      width: 30%;
+      left: 0;
+      width: 100%;
       height: 22%;
-      cursor: pointer;
+      cursor: pointer !important;
       z-index: 4;
       background: transparent;
       border: none;
       padding: 0;
       margin: 0;
+      display: block;
+      pointer-events: auto;
       appearance: none;
       -webkit-appearance: none;
     }
 
     .body-area {
       position: absolute;
-      top: 22%;
-      left: 22%;
-      width: 56%;
-      height: 72%;
-      cursor: pointer;
+      top: 18%;
+      left: 0;
+      width: 100%;
+      height: 82%;
+      cursor: pointer !important;
       z-index: 3;
       background: transparent;
       border: none;
       padding: 0;
       margin: 0;
+      display: block;
+      pointer-events: auto;
       appearance: none;
       -webkit-appearance: none;
     }
@@ -755,7 +777,7 @@
         right: calc(100% + 10px);
         bottom: 0;
         display: flex;
-        flex-direction: row-reverse;
+        flex-direction: row;
         align-items: center;
         gap: 8px;
         opacity: 0;
@@ -1329,6 +1351,13 @@ B&B Tokyo Jingumae Shop
 
     let lastMouseX = window.innerWidth / 2;
     let lastMouseY = window.innerHeight / 2;
+    let ignoreNextPointerUp = false;
+    let lastPointerMoveStamp = -1;
+    let lastPointerDownStamp = -1;
+    let lastPointerUpStamp = -1;
+    let ignoreUpUntil = 0;
+    let lastPenPickupTime = -1000;
+    const supportsPointerEvents = "PointerEvent" in window;
 
     let currentHandSrc = "hand01.png";
     let handExpanded = false;
@@ -1684,57 +1713,72 @@ khepriButton.classList.remove("is-copied", "is-stage-two", "force-normal");
     });
 
 khepriButton.addEventListener("click", async (event) => {
-  event.stopPropagation();
+      if (isSelected) {
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
 
-  clearTimeout(khepriCopiedTimer);
+      event.preventDefault();
+      event.stopPropagation();
 
-  khepriButton.classList.remove("force-normal");
+      clearTimeout(khepriCopiedTimer);
+      khepriButton.classList.remove("force-normal");
 
-  /*
-    手机横屏 / 被压扁状态限定：
-    第一次点：01 → 02
-    第二次点：02 → 03，复制地址，3秒后回到01
-  */
-  if (isFlatLayout()) {
-    if (khepriMobileStage === 0) {
-      khepriMobileStage = 1;
+      /*
+        手机端 / 手机横屏 / 被压扁状态：
+        第一次点：01 → 02
+        第二次点：02 → 03，并复制地址
+        03 停留 3 秒后自动回到 01
+        回到 01 后可以重复同样操作
+      */
+      if (isMobileKhepriMode()) {
+        if (khepriMobileStage === 0) {
+          khepriMobileStage = 1;
 
-      khepriButton.classList.remove("is-copied");
-      khepriButton.classList.add("is-stage-two");
+          khepriButton.classList.remove("is-copied", "force-normal");
+          khepriButton.classList.add("is-stage-two");
 
-      return;
-    }
+          return;
+        }
 
-    khepriMobileStage = 0;
+        if (khepriMobileStage === 1) {
+          khepriMobileStage = 2;
 
-    khepriButton.classList.remove("is-stage-two");
-    khepriButton.classList.add("is-copied");
+          khepriButton.classList.remove("is-stage-two", "force-normal");
+          khepriButton.classList.add("is-copied");
 
-    await copyAddresses();
+          await copyAddresses();
 
-    khepriCopiedTimer = setTimeout(() => {
-      khepriButton.classList.remove("is-copied", "is-stage-two");
-    }, 3000);
+          khepriCopiedTimer = setTimeout(() => {
+            khepriMobileStage = 0;
+            khepriButton.classList.remove("is-copied", "is-stage-two");
+            khepriButton.classList.add("force-normal");
+          }, 3000);
 
-    return;
-  }
+          return;
+        }
 
-  /*
-    宽屏 / 普通桌面状态：
-    保持原来的逻辑，点击直接 03，复制地址，3秒后回到01
-  */
-  khepriMobileStage = 0;
+        return;
+      }
 
-  khepriButton.classList.remove("is-stage-two");
-  khepriButton.classList.add("is-copied");
+      /*
+        宽屏桌面状态：
+        点击直接显示 khepri03.png，复制地址，3 秒后回到 khepri01.png。
+      */
+      khepriMobileStage = 0;
 
-  await copyAddresses();
+      khepriButton.classList.remove("is-stage-two", "force-normal");
+      khepriButton.classList.add("is-copied");
 
-  khepriCopiedTimer = setTimeout(() => {
-    khepriButton.classList.remove("is-copied");
-    khepriButton.classList.add("force-normal");
-  }, 3000);
-});
+      await copyAddresses();
+
+      khepriCopiedTimer = setTimeout(() => {
+        khepriButton.classList.remove("is-copied", "is-stage-two");
+        khepriButton.classList.add("force-normal");
+      }, 3000);
+    });
+
 
     handWrap.addEventListener("pointerdown", (event) => {
       if (!home.classList.contains("guide-complete")) return;
@@ -1785,6 +1829,14 @@ khepriButton.addEventListener("click", async (event) => {
       return window.matchMedia("(max-height: 620px) and (min-width: 701px)").matches;
     }
 
+    function isMobileKhepriMode() {
+      return (
+        window.matchMedia("(hover: none) and (pointer: coarse)").matches ||
+        window.matchMedia("(max-height: 620px) and (min-width: 701px)").matches ||
+        window.matchMedia("(max-width: 900px) and (max-height: 700px)").matches
+      );
+    }
+
     function getSelectedPenAngle() {
       const baseAngle = isFlatLayout() ? 90 : 0;
       const selectedAngle = baseAngle + 18;
@@ -1813,12 +1865,9 @@ khepriButton.addEventListener("click", async (event) => {
 
       home.classList.toggle("hand-click-ready", clickReady);
 
-      if ((clickReady && manualHandMode) || isHandAnimating) {
+      if (isHandAnimating) {
         return;
       }
-
-      manualHandMode = false;
-      handExpanded = false;
 
       const progress = clampNumber(
         (HAND_MAX_WIDTH - w) / (HAND_MAX_WIDTH - HAND_MIN_WIDTH),
@@ -1828,16 +1877,45 @@ khepriButton.addEventListener("click", async (event) => {
 
       let nextFrame = 1;
 
-      if (progress < 0.45) {
-        nextFrame = 1;
-      } else if (progress < 0.60) {
-        nextFrame = 2;
-      } else if (progress < 0.75) {
-        nextFrame = 3;
-      } else if (progress < 0.90) {
-        nextFrame = 4;
+      /*
+        通常状态：窗口从宽到窄时，hand01 → hand05。
+        点击手之后：hand10 成为新的最宽状态，窗口从宽到窄时，hand10 → hand05。
+      */
+      if (clickReady && handExpanded) {
+        manualHandMode = true;
+
+        if (progress < 0.36) {
+          nextFrame = 10;
+        } else if (progress < 0.50) {
+          nextFrame = 9;
+        } else if (progress < 0.64) {
+          nextFrame = 8;
+        } else if (progress < 0.78) {
+          nextFrame = 7;
+        } else if (progress < 0.90) {
+          nextFrame = 6;
+        } else {
+          nextFrame = 5;
+        }
       } else {
-        nextFrame = 5;
+        if (clickReady && manualHandMode) {
+          return;
+        }
+
+        manualHandMode = false;
+        handExpanded = false;
+
+        if (progress < 0.45) {
+          nextFrame = 1;
+        } else if (progress < 0.60) {
+          nextFrame = 2;
+        } else if (progress < 0.75) {
+          nextFrame = 3;
+        } else if (progress < 0.90) {
+          nextFrame = 4;
+        } else {
+          nextFrame = 5;
+        }
       }
 
       const nextSrc = `hand${String(nextFrame).padStart(2, "0")}.png`;
@@ -1910,8 +1988,11 @@ khepriButton.addEventListener("click", async (event) => {
       }
     }
 
-    function pickUpPen(mouseX, mouseY) {
+    function pickUpPen(mouseX, mouseY, shouldIgnoreNextPointerUp = true) {
       isSelected = true;
+      ignoreNextPointerUp = shouldIgnoreNextPointerUp;
+      lastPenPickupTime = performance.now();
+      ignoreUpUntil = lastPenPickupTime + 520;
       isDrawing = false;
       hasMoved = false;
       lastPoint = null;
@@ -1924,23 +2005,30 @@ khepriButton.addEventListener("click", async (event) => {
       clearCanvas();
 
       home.classList.add("pen-mode");
-penWrap.classList.add("is-selected");
+      document.documentElement.classList.add("pen-mode-active");
+      document.body.classList.add("pen-mode-active");
+      penWrap.classList.add("is-selected");
 
-/* 拿起笔后，先收起可能打开的 UI，避免和画笔冲突 */
-closeAbout();
-languageSwitch.classList.remove("is-open");
+      /* 拿起笔后，先收起可能打开的 UI，避免和画笔冲突 */
+      closeAbout();
+      languageSwitch.classList.remove("is-open");
 
+      /* 笔被拿起的瞬间，笔尖立刻取代鼠标位置 */
       movePenTipTo(mouseX, mouseY);
     }
 
     function putDownPen() {
       isSelected = false;
+      ignoreNextPointerUp = false;
+      ignoreUpUntil = 0;
       isDrawing = false;
       hasMoved = false;
       lastPoint = null;
       currentStroke = [];
 
       home.classList.remove("pen-mode");
+      document.documentElement.classList.remove("pen-mode-active");
+      document.body.classList.remove("pen-mode-active");
       penWrap.classList.remove("is-selected");
 
       penWrap.style.left = "";
@@ -2142,6 +2230,14 @@ languageSwitch.classList.remove("is-open");
       }
     }
 
+    pressButton.addEventListener("pointerdown", (event) => {
+      event.stopPropagation();
+    });
+
+    pressButton.addEventListener("mousedown", (event) => {
+      event.stopPropagation();
+    });
+
     pressButton.addEventListener("click", (event) => {
       event.stopPropagation();
 
@@ -2154,20 +2250,47 @@ languageSwitch.classList.remove("is-open");
       }
     });
 
-    bodyButton.addEventListener("click", (event) => {
+    function handleBodyPickUp(event) {
+      if (event.cancelable) {
+        event.preventDefault();
+      }
       event.stopPropagation();
 
-      if (!isSelected) {
-        pickUpPen(event.clientX, event.clientY);
+      if (isSelected) return;
 
-        if (!step2Done && step1Done) {
-          step2Done = true;
-          updateGuide();
-        }
+      if (event.pointerId !== undefined && event.currentTarget && event.currentTarget.releasePointerCapture) {
+        requestAnimationFrame(() => {
+          try {
+            event.currentTarget.releasePointerCapture(event.pointerId);
+          } catch (error) {}
+        });
       }
+
+      pickUpPen(event.clientX, event.clientY, true);
+
+      if (!step2Done && step1Done) {
+        step2Done = true;
+        updateGuide();
+      }
+    }
+
+    bodyButton.addEventListener("pointerdown", handleBodyPickUp);
+
+    /*
+      Chrome 会在 pointerdown 后额外触发 mousedown / click。
+      这些只负责拦截，不能再次改变笔的状态，否则笔会突然不像鼠标。
+    */
+    bodyButton.addEventListener("mousedown", (event) => {
+      if (event.cancelable) event.preventDefault();
+      event.stopPropagation();
     });
 
-    window.addEventListener("pointerdown", (event) => {
+    bodyButton.addEventListener("click", (event) => {
+      if (event.cancelable) event.preventDefault();
+      event.stopPropagation();
+    });
+
+    function beginDrawPointer(event) {
       if (!isSelected) {
         if (!languageSwitch.contains(event.target)) {
           languageSwitch.classList.remove("is-open");
@@ -2175,11 +2298,22 @@ languageSwitch.classList.remove("is-open");
         return;
       }
 
+      if (event.cancelable) {
+        event.preventDefault();
+      }
+
       pointerDownX = event.clientX;
       pointerDownY = event.clientY;
       hasMoved = false;
 
-      if (!isPressed) return;
+      movePenTipTo(event.clientX, event.clientY);
+
+      if (!isPressed) {
+        isDrawing = false;
+        lastPoint = null;
+        currentStroke = [];
+        return;
+      }
 
       isDrawing = true;
 
@@ -2189,13 +2323,16 @@ languageSwitch.classList.remove("is-open");
       };
 
       currentStroke = [lastPoint];
-    });
+    }
 
-    window.addEventListener("pointermove", (event) => {
+    function handlePointerMove(event) {
       if (!isSelected) return;
 
       lastMouseX = event.clientX;
       lastMouseY = event.clientY;
+
+      /* 核心：笔被拿起之后，鼠标到哪里，笔尖就到哪里。 */
+      movePenTipTo(event.clientX, event.clientY);
 
       const distanceX = event.clientX - pointerDownX;
       const distanceY = event.clientY - pointerDownY;
@@ -2204,8 +2341,6 @@ languageSwitch.classList.remove("is-open");
       if (distance > moveThreshold) {
         hasMoved = true;
       }
-
-      movePenTipTo(event.clientX, event.clientY);
 
       if (isDrawing && isPressed) {
         const currentPoint = {
@@ -2220,10 +2355,19 @@ languageSwitch.classList.remove("is-open");
         currentStroke.push(currentPoint);
         lastPoint = currentPoint;
       }
-    });
+    }
 
-    window.addEventListener("pointerup", () => {
+    function finishDrawPointer(event) {
       if (!isSelected) return;
+
+      const now = performance.now();
+
+      /* 拿起笔那一下的 mouseup / pointerup 只说明用户松开了笔身，不应该把笔放回去。 */
+      if (ignoreNextPointerUp || now <= ignoreUpUntil || now - lastPenPickupTime < 520) {
+        ignoreNextPointerUp = false;
+        hasMoved = false;
+        return;
+      }
 
       if (!hasMoved) {
         putDownPen();
@@ -2248,7 +2392,17 @@ languageSwitch.classList.remove("is-open");
       }
 
       putDownPen();
-    });
+    }
+
+    if (supportsPointerEvents) {
+      window.addEventListener("pointerdown", beginDrawPointer, true);
+      document.addEventListener("pointermove", handlePointerMove, true);
+      window.addEventListener("pointerup", finishDrawPointer, true);
+    } else {
+      window.addEventListener("mousedown", beginDrawPointer, true);
+      document.addEventListener("mousemove", handlePointerMove, true);
+      window.addEventListener("mouseup", finishDrawPointer, true);
+    }
 
     window.addEventListener("pointercancel", () => {
       putDownPen();
