@@ -903,8 +903,15 @@ body.pen-mode-active * {
       .pen-wrap,
       .home.guide-complete .pen-wrap {
         left: 50vw;
-        height: 68vh;
-        top: 51vh;
+        height: 68dvh;
+        top: 51dvh;
+      }
+
+      /* iOS Safari puts the browser bar at the bottom, so the same center looks visually too high.
+         Only Safari gets a small downward correction; Chrome iOS keeps the original layout. */
+      .home.mobile-safari .pen-wrap,
+      .home.mobile-safari.guide-complete .pen-wrap {
+        top: 54dvh;
       }
 
       .about-ui {
@@ -1374,6 +1381,19 @@ B&B Tokyo Jingumae Shop
     };
 
     let currentLang = "en";
+
+    const ua = navigator.userAgent || "";
+    const isIOSDevice = /iPad|iPhone|iPod/.test(ua) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    const isIOSChrome = /CriOS/.test(ua);
+    const isIOSFirefox = /FxiOS/.test(ua);
+    const isIOSEdge = /EdgiOS/.test(ua);
+    const isMobileSafari = isIOSDevice && /Safari/.test(ua) &&
+      !isIOSChrome && !isIOSFirefox && !isIOSEdge;
+
+    if (isMobileSafari) {
+      home.classList.add("mobile-safari");
+    }
 
     let isPressed = false;
     let isSelected = false;
