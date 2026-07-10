@@ -1,0 +1,3919 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BوB</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      background: #ffffff;
+      overflow: hidden;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    img,
+    button {
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-user-drag: none;
+      -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .home {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      background: #ffffff;
+
+      --pen-rest-rotation: 90deg;
+      --pen-selected-rotation: 18deg;
+
+      --about-rotate: 0deg;
+      --about-shift-x: -44px;
+      --about-shift-y: 0px;
+    }
+
+    .home.guide-complete {
+      --pen-rest-rotation: 0deg;
+    }
+
+    .home.pen-mode {
+      cursor: none;
+    }
+
+    .home.pen-mode .logo-wrap,
+.home.pen-mode .hand-wrap,
+.home.pen-mode .about-ui,
+.home.pen-mode .about-panel,
+.home.pen-mode .language-switch,
+.home.pen-mode .color-switch {
+  pointer-events: none !important;
+}
+
+
+html.pen-mode-active,
+html.pen-mode-active *,
+body.pen-mode-active,
+body.pen-mode-active * {
+  cursor: none !important;
+}
+
+    #drawCanvas {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 9998;
+      pointer-events: none;
+    }
+
+    .logo-wrap {
+      position: fixed;
+      top: 2.4vh;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 36;
+      cursor: pointer;
+      pointer-events: auto;
+    }
+
+    .logo {
+      display: block;
+      width: clamp(180px, 22vw, 360px);
+      height: auto;
+    }
+
+    .hand-wrap {
+      position: fixed;
+      left: -4vw;
+      bottom: 0;
+      width: min(72vh, 690px);
+      height: 100vh;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .home.guide-complete.hand-click-ready .hand-wrap {
+      pointer-events: auto;
+      cursor: pointer;
+    }
+
+    .hand-inner {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
+      transform: translateY(108%);
+      opacity: 0;
+      transition:
+        transform 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.25s ease;
+      will-change: transform, opacity;
+    }
+
+    .home.guide-complete .hand-inner {
+      transform: translateY(0%);
+      opacity: 1;
+      transition-delay: 0.12s;
+    }
+
+    .hand-frame {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: left bottom;
+      pointer-events: none;
+      opacity: 1;
+      transition: none;
+      transform: translateY(5.2vh) scale(1.06);
+      transform-origin: left bottom;
+    }
+
+    .guide {
+      position: fixed;
+      left: 4.2vw;
+      top: 18vh;
+      z-index: 3;
+      pointer-events: none;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-weight: 400;
+      color: #000000;
+    }
+
+    /* EN handwriting guide: desktop uses EN1/2/3.png, phone uses EN1/2/3_phone.png.
+       Completed steps disappear; future steps stay light gray. */
+    .guide-en-steps {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 3;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-select: none;
+      display: none;
+      --en-guide-base-y: 3.4vh;
+    }
+
+    .home.lang-en:not(.guide-complete) .guide-en-steps {
+      display: block;
+    }
+
+    .home.lang-en .guide {
+      display: none;
+    }
+
+    .guide-en-step-img {
+      position: absolute;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: contain;
+      object-position: center center;
+      pointer-events: none;
+      opacity: 1;
+      transform: translateY(calc(var(--en-guide-base-y, 0vh) + var(--en-step-shift-y, 0vh)));
+      transition:
+        opacity 0.22s ease,
+        filter 0.22s ease,
+        transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+      will-change: opacity, transform;
+    }
+
+    .guide-en-step-img.is-current {
+      opacity: 1;
+      filter: none;
+    }
+
+    .guide-en-step-img.is-disabled {
+      opacity: 0.18;
+      filter: none;
+    }
+
+    .guide-en-step-img.is-completed {
+      opacity: 0;
+      filter: none;
+    }
+
+    .guide-en-steps.is-phone {
+      --en-guide-base-y: 14.5vh;
+    }
+
+    .guide-en-steps.is-phone .guide-en-step-img {
+      object-position: center top;
+    }
+
+    .home.lang-jp .guide {
+      font-family: "Tsukushi Gothic", "筑紫ゴシック", "Yu Gothic", "YuGothic", sans-serif;
+    }
+
+    .home.lang-cn .guide {
+      font-family: "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    .home.lang-ar .guide {
+      left: auto;
+      right: 4.2vw;
+      direction: rtl;
+      text-align: right;
+      font-family: "Helvetica Neue", Arial, sans-serif;
+    }
+
+    .guide-step {
+      margin: 0 0 10px 0;
+      font-size: clamp(34px, 5.8vw, 86px);
+      line-height: 0.9;
+      letter-spacing: -0.07em;
+      color: #000000;
+      transition:
+        opacity 0.25s ease,
+        color 0.25s ease,
+        transform 0.25s ease;
+    }
+
+    .home.lang-jp .guide-step,
+    .home.lang-cn .guide-step {
+      font-size: clamp(28px, 4.8vw, 72px);
+      letter-spacing: -0.045em;
+      line-height: 1.04;
+    }
+
+    .home.lang-ar .guide-step {
+      letter-spacing: 0;
+      line-height: 1.05;
+    }
+
+    .guide-step.is-disabled {
+      color: #c8c8c8;
+    }
+
+    .guide-step.is-completed {
+      opacity: 0;
+      transform: translateY(-10px);
+      height: 0;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    .about-ui {
+      position: fixed;
+      top: 1.6vh;
+      right: 0.8vw;
+      z-index: 35;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-125%);
+      transition:
+        transform 0.78s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.2s ease;
+      transition-delay: 0s;
+    }
+
+    .home.guide-complete .about-ui {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+      transition-delay: 0.18s;
+    }
+
+    .about-button {
+      position: relative;
+      border: none;
+      background: transparent;
+      color: #000000;
+      padding: 0;
+      line-height: 1;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      display: block;
+      width: clamp(420px, 33vw, 650px);
+      aspect-ratio: 650 / 330;
+      overflow: visible;
+    }
+
+    .about-art {
+      position: absolute;
+      right: 0;
+      top: 0;
+      display: block;
+      width: clamp(760px, 58vw, 1180px);
+      aspect-ratio: 1115 / 413;
+      transform:
+        translate(var(--about-shift-x), var(--about-shift-y))
+        rotate(var(--about-rotate));
+      transform-origin: 62% 52%;
+      transition: transform 0.16s linear;
+      pointer-events: none;
+    }
+
+    .about-art-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: right top;
+      pointer-events: none;
+    }
+
+    .about-art-normal {
+      display: block;
+    }
+
+    .about-art-hover,
+    .about-art-vertical {
+      display: none;
+    }
+
+    .about-button:hover .about-art-normal,
+    .about-button.is-active .about-art-normal {
+      display: none;
+    }
+
+    .about-button:hover .about-art-hover,
+    .about-button.is-active .about-art-hover {
+      display: block;
+    }
+
+    .home.about-vertical .about-art-normal {
+      display: block;
+    }
+
+    .home.about-vertical .about-art-hover,
+    .home.about-vertical .about-art-vertical {
+      display: none;
+    }
+
+    .home.about-vertical .about-button:hover .about-art-normal,
+    .home.about-vertical .about-button.is-active .about-art-normal {
+      display: none;
+    }
+
+    .home.about-vertical .about-button:hover .about-art-vertical,
+    .home.about-vertical .about-button.is-active .about-art-vertical {
+      display: block;
+    }
+
+    .about-text {
+      display: none;
+    }
+
+    .question-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center;
+      pointer-events: none;
+    }
+
+    .question-img-normal {
+      display: block;
+    }
+
+    .question-img-hover {
+      display: none;
+    }
+
+    .about-button:hover .question-img-normal,
+    .about-button.is-active .question-img-normal {
+      display: none;
+    }
+
+    .about-button:hover .question-img-hover,
+    .about-button.is-active .question-img-hover {
+      display: block;
+    }
+
+    .about-panel {
+      position: fixed;
+      top: 38vh;
+      right: 2.4vw;
+      width: min(44vw, 620px);
+      max-height: 47vh;
+      overflow: auto;
+      z-index: 34;
+      background: transparent;
+      border: none;
+      color: #000000;
+      transform: translateY(-130%);
+      opacity: 0;
+      pointer-events: none;
+      transition:
+        transform 0.58s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.18s ease;
+    }
+
+    .home.about-open .about-panel {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .about-content {
+      padding: 0 0 34px;
+      font-family: "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+      text-align: right;
+    }
+
+    .about-title {
+      display: none;
+      margin: 0 0 26px 0;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-size: clamp(42px, 10vw, 86px);
+      line-height: 0.9;
+      letter-spacing: -0.06em;
+      font-weight: 400;
+      text-align: right;
+    }
+
+    .home.lang-jp .about-content {
+      font-family: "Tsukushi Gothic", "筑紫ゴシック", "Yu Gothic", "YuGothic", sans-serif;
+      text-align: right;
+    }
+
+    .home.lang-cn .about-content {
+      text-align: right;
+    }
+
+    .home.lang-ar .about-content {
+      direction: rtl;
+      text-align: right;
+      font-family: "Helvetica Neue", Arial, sans-serif;
+    }
+
+    .about-content p {
+      margin: 0 0 18px 0;
+      font-size: clamp(17px, 1.45vw, 23px);
+      line-height: 1.42;
+      font-weight: 400;
+      letter-spacing: -0.035em;
+    }
+
+    .home.lang-jp .about-content p,
+    .home.lang-cn .about-content p {
+      letter-spacing: -0.025em;
+      line-height: 1.48;
+    }
+
+    .home.lang-ar .about-content p {
+      letter-spacing: 0;
+      line-height: 1.55;
+    }
+
+    .mobile-shop {
+      display: none;
+    }
+
+    .about-close {
+      display: none;
+      position: fixed;
+      top: 31vh;
+      right: 2.4vw;
+      z-index: 41;
+      border: none;
+      background: transparent;
+      color: #000000;
+      font-size: 46px;
+      line-height: 1;
+      cursor: pointer;
+      padding: 0;
+      opacity: 0;
+      pointer-events: none;
+      appearance: none;
+      -webkit-appearance: none;
+      transition: color 0.18s ease;
+    }
+
+    .about-close:hover {
+      color: #42bdff;
+    }
+
+.khepri-ui {
+  position: fixed;
+  right: 2.2vw;
+  bottom: 12vh;
+  width: clamp(230px, 18vw, 380px);
+  z-index: 38;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(140%);
+  transition:
+    transform 0.78s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.22s ease;
+}
+
+    .home.guide-complete .khepri-ui {
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: auto;
+      transition-delay: 0.28s;
+    }
+
+    .home.about-open .khepri-ui {
+      opacity: 0;
+      transform: translateX(150%);
+      pointer-events: none;
+      transition-delay: 0s;
+    }
+
+    .khepri-button {
+      display: block;
+      width: 100%;
+      border: none;
+      background: transparent;
+      padding: 0;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .khepri-img {
+      display: block;
+      width: 100%;
+      height: auto;
+      pointer-events: none;
+    }
+
+    .khepri-img-hover,
+    .khepri-img-copied,
+    .khepri-img-crawl-left,
+    .khepri-img-crawl-right {
+      display: none;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .khepri-button:hover .khepri-img-normal {
+        display: none;
+      }
+
+      .khepri-button:hover .khepri-img-hover {
+        display: block;
+      }
+    }
+
+    .khepri-button.is-stage-two .khepri-img-normal,
+    .khepri-button.is-stage-two .khepri-img-copied {
+      display: none !important;
+    }
+
+    .khepri-button.is-stage-two .khepri-img-hover {
+      display: block !important;
+    }
+
+    .khepri-button.is-copied .khepri-img-normal,
+    .khepri-button.is-copied .khepri-img-hover {
+      display: none !important;
+    }
+
+    .khepri-button.is-copied .khepri-img-copied {
+      display: block !important;
+    }
+
+    .khepri-button.force-normal .khepri-img-normal {
+      display: block !important;
+    }
+
+    .khepri-button.force-normal .khepri-img-hover,
+    .khepri-button.force-normal .khepri-img-copied,
+    .khepri-button.force-normal .khepri-img-crawl-left,
+    .khepri-button.force-normal .khepri-img-crawl-right {
+      display: none !important;
+    }
+
+    .khepri-button.is-crawling .khepri-img-normal,
+    .khepri-button.is-crawling .khepri-img-hover,
+    .khepri-button.is-crawling .khepri-img-copied {
+      display: none !important;
+    }
+
+    .khepri-button.is-crawling.is-crawl-left .khepri-img-crawl-left {
+      display: block !important;
+    }
+
+    .khepri-button.is-crawling.is-crawl-right .khepri-img-crawl-right {
+      display: block !important;
+    }
+
+    .khepri-button.is-hover-paused .khepri-img-normal,
+    .khepri-button.is-hover-paused .khepri-img-copied,
+    .khepri-button.is-hover-paused .khepri-img-crawl-left,
+    .khepri-button.is-hover-paused .khepri-img-crawl-right {
+      display: none !important;
+    }
+
+    .khepri-button.is-hover-paused .khepri-img-hover {
+      display: block !important;
+    }
+
+    .khepri-button.is-copied .khepri-img-normal,
+    .khepri-button.is-copied .khepri-img-hover,
+    .khepri-button.is-copied .khepri-img-crawl-left,
+    .khepri-button.is-copied .khepri-img-crawl-right {
+      display: none !important;
+    }
+
+    .khepri-button.is-copied .khepri-img-copied {
+      display: block !important;
+    }
+
+    .language-switch {
+      position: fixed;
+      right: 2.2vw;
+      bottom: 2.2vh;
+      z-index: 10020;
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-weight: 400;
+    }
+
+    .language-toggle {
+      display: none;
+      position: relative;
+      width: 56px;
+      height: 56px;
+      border: none;
+      background: transparent;
+      color: #000000;
+      padding: 0;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .lan-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center;
+      pointer-events: none;
+    }
+
+    .lan-img-normal {
+      display: block;
+    }
+
+    .lan-img-hover {
+      display: none;
+    }
+
+    .language-toggle:hover .lan-img-normal,
+    .language-switch.is-open .lan-img-normal {
+      display: none;
+    }
+
+    .language-toggle:hover .lan-img-hover,
+    .language-switch.is-open .lan-img-hover {
+      display: block;
+    }
+
+    .language-options {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+    }
+
+    .language-button {
+      position: relative;
+      display: block;
+      width: clamp(54px, 4.6vw, 82px);
+      aspect-ratio: 1 / 1;
+      border: none;
+      background: transparent;
+      color: #000000;
+      padding: 0;
+      line-height: 1;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .lang-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center;
+      display: block;
+      pointer-events: none;
+    }
+
+    .lang-img-normal {
+      display: block;
+    }
+
+    .lang-img-hover {
+      display: none;
+    }
+
+    .language-button:hover .lang-img-normal,
+    .language-button.is-active .lang-img-normal {
+      display: none;
+    }
+
+    .language-button:hover .lang-img-hover,
+    .language-button.is-active .lang-img-hover {
+      display: block;
+    }
+
+    .color-switch {
+      position: fixed;
+      left: 2.2vw;
+      bottom: 2.2vh;
+      z-index: 10020;
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+      pointer-events: auto;
+      transition:
+        left 0.46s cubic-bezier(0.22, 1, 0.36, 1),
+        bottom 0.46s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.46s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.18s ease;
+    }
+
+    /* Before the guide is complete, the color switch stays in the bottom-left
+       position you liked. After the hand appears, it politely slides to the
+       right so it no longer fights with the hand drawing. */
+    .home.guide-complete .color-switch {
+      left: clamp(274px, 28.5vw, 520px);
+    }
+
+    .color-button {
+      position: relative;
+      display: block;
+      width: clamp(54px, 4.6vw, 82px);
+      aspect-ratio: 1 / 1;
+      border: none;
+      background: transparent;
+      padding: 0;
+      line-height: 1;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      opacity: 0.48;
+      transition:
+        opacity 0.18s ease,
+        transform 0.18s ease;
+    }
+
+    .color-button:hover,
+    .color-button.is-active {
+      opacity: 1;
+    }
+
+    .color-button:active {
+      transform: translateY(1px) scale(0.96);
+    }
+
+    .color-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center;
+      display: block;
+      pointer-events: none;
+    }
+
+    .pen-wrap {
+      position: fixed;
+      left: 50vw;
+      top: 76vh;
+      height: 120vh;
+      z-index: 9999;
+      transform: translate(-50%, -50%) rotate(var(--pen-rest-rotation));
+      transform-origin: 50% 50%;
+      transition:
+        transform 0.18s ease,
+        left 0.18s ease,
+        top 0.18s ease,
+        height 0.18s ease;
+      will-change: left, top, transform;
+      pointer-events: auto;
+    }
+
+    .home.guide-complete .pen-wrap {
+      left: 50vw;
+      top: 54.5vh;
+      height: 82vh;
+    }
+
+    .pen-wrap.is-selected {
+      z-index: 99999;
+      transform: translate(-50%, -50%) rotate(var(--pen-selected-rotation));
+      transition: none;
+      pointer-events: none;
+    }
+
+    .home.pen-mode .pen-wrap {
+      z-index: 99999;
+    }
+
+    .pen {
+      display: block;
+      height: 100%;
+      width: auto;
+      pointer-events: none;
+    }
+
+    .press-area {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 22%;
+      cursor: pointer !important;
+      z-index: 4;
+      background: transparent;
+      border: none;
+      padding: 0;
+      margin: 0;
+      display: block;
+      pointer-events: auto;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .body-area {
+      position: absolute;
+      top: 18%;
+      left: 0;
+      width: 100%;
+      height: 70%;
+      cursor: pointer !important;
+      z-index: 3;
+      background: transparent;
+      border: none;
+      padding: 0;
+      margin: 0;
+      display: block;
+      pointer-events: auto;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .press-area:focus,
+    .body-area:focus,
+    .language-button:focus,
+    .language-toggle:focus,
+    .about-button:focus,
+    .about-close:focus,
+    .khepri-button:focus,
+    .color-button:focus {
+      outline: none;
+    }
+
+    @media (max-width: 1100px) and (min-width: 701px) {
+      .hand-wrap {
+        width: min(66vh, 630px);
+        height: 96vh;
+        left: -3.4vw;
+      }
+
+      .hand-frame {
+        transform: translateY(5.6vh) scale(1.06);
+      }
+
+      .about-art {
+        width: clamp(560px, 54vw, 820px);
+      }
+
+      .about-panel {
+        top: 39vh;
+        max-height: 45vh;
+      }
+
+      .khepri-ui {
+        width: clamp(150px, 14vw, 240px);
+        bottom: 24vh;
+      }
+
+      .language-button {
+        width: clamp(50px, 5.2vw, 72px);
+      }
+
+      .home:not(.guide-complete) .pen-wrap {
+        height: min(98vh, 86vw);
+        top: 78vh;
+      }
+
+      .home.guide-complete .pen-wrap {
+        height: 78vh;
+      }
+
+      .home.guide-complete .color-switch {
+        left: clamp(228px, 30.5vw, 392px);
+      }
+    }
+
+    @media (max-width: 820px) {
+      .language-switch {
+        right: 3.2vw;
+        bottom: 3.2vw;
+        display: block;
+      }
+
+      .home.about-open .language-switch {
+        z-index: 46;
+      }
+
+      .language-toggle {
+        display: block;
+      }
+
+      .language-options {
+        position: absolute;
+        right: 0;
+        bottom: calc(100% + 6px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(8px);
+        transition:
+          opacity 0.2s ease,
+          transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      .language-switch.is-open .language-options {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateY(0);
+      }
+
+      .language-button {
+        width: 54px;
+        height: 54px;
+      }
+
+      .color-button {
+        width: 54px;
+        height: 54px;
+      }
+
+      .about-art {
+        display: none;
+      }
+
+      .about-text {
+        position: relative;
+        display: block;
+        width: 56px;
+        height: 56px;
+      }
+
+      .about-button {
+        border: none;
+        background: transparent;
+        padding: 0;
+        width: auto;
+        height: auto;
+        aspect-ratio: auto;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .home {
+        --pen-rest-rotation: 0deg;
+        --pen-selected-rotation: 18deg;
+        --about-rotate: 0deg !important;
+        --about-shift-x: 0px !important;
+        --about-shift-y: 0px !important;
+      }
+
+      .logo-wrap {
+        top: 3vw;
+        z-index: 10040;
+      }
+
+      #drawCanvas {
+        z-index: 199998;
+      }
+
+      .pen-wrap,
+      .pen-wrap.is-selected,
+      .home.pen-mode .pen-wrap {
+        z-index: 199999;
+      }
+
+      .about-ui {
+        z-index: 10050;
+      }
+
+      .about-panel {
+        z-index: 10030;
+      }
+
+      .language-switch,
+      .home.about-open .language-switch {
+        z-index: 10060;
+      }
+
+      .about-close {
+        z-index: 10070;
+      }
+
+      .logo {
+        width: 94vw;
+      }
+
+      /* Mobile ABOUT opens like a new sheet from the top.
+         Hide the fixed logo and question icon while the sheet is open,
+         then start the title near the top with a safe margin. */
+      .home.about-open .logo-wrap,
+      .home.about-open .about-ui {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .home.about-open .about-content {
+        padding-top: max(34px, calc(env(safe-area-inset-top) + 28px));
+      }
+
+      .hand-wrap {
+        display: none;
+      }
+
+      .guide {
+        left: 4.5vw;
+        top: 38vw;
+      }
+
+      .home.lang-ar .guide {
+        left: auto;
+        right: 4.5vw;
+      }
+
+      .guide-step {
+        font-size: clamp(24px, 7.4vw, 46px);
+        margin-bottom: 7px;
+      }
+
+      .home.lang-jp .guide-step,
+      .home.lang-cn .guide-step {
+        font-size: clamp(21px, 6.5vw, 38px);
+        line-height: 1.08;
+      }
+
+      .pen-wrap,
+      .home.guide-complete .pen-wrap {
+        left: 50vw;
+        height: 74dvh;
+        top: 56.4dvh;
+      }
+
+      /* iOS Safari puts the browser bar at the bottom, so the same center looks visually too high.
+         Only Safari gets a small downward correction; Chrome iOS keeps the original layout. */
+      .home.mobile-safari .pen-wrap,
+      .home.mobile-safari.guide-complete .pen-wrap {
+        top: 56.4dvh;
+      }
+
+      .about-ui {
+        top: auto;
+        right: auto;
+        left: 4vw;
+        bottom: 3.2vw;
+        transform: translateY(0);
+      }
+
+      .home.guide-complete .about-ui {
+        transform: translateY(0);
+      }
+
+      .about-panel {
+        top: 0;
+        left: 0;
+        right: auto;
+        width: 100vw;
+        height: 100dvh;
+        max-height: none;
+        z-index: 10030;
+        background: #ffffff;
+        transform: translateY(-105%);
+        opacity: 0;
+      }
+
+      .home.about-open .about-panel {
+        transform: translateY(0);
+        opacity: 1;
+      }
+
+      .about-content {
+        padding: max(34px, calc(env(safe-area-inset-top) + 28px)) 22px 118px;
+        text-align: left;
+      }
+
+      .about-title {
+        display: block;
+        text-align: left;
+        border-bottom: 2px solid #000000;
+        padding-bottom: 14px;
+        margin: 0 56px 24px 0;
+
+        font-size: clamp(34px, 11.5vw, 60px);
+        line-height: 0.9;
+        letter-spacing: -0.065em;
+        font-weight: 400;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      }
+
+      .home.lang-jp .about-content,
+      .home.lang-cn .about-content {
+        text-align: left;
+      }
+
+      .home.lang-ar .about-content {
+        direction: rtl;
+        text-align: right;
+      }
+
+      .home.lang-ar .about-title {
+        text-align: right;
+        margin: 0 0 24px 56px;
+      }
+
+      .about-content p {
+        font-size: clamp(18px, 5vw, 24px);
+        line-height: 1.46;
+        letter-spacing: -0.04em;
+        margin-bottom: 18px;
+      }
+
+      .home.lang-jp .about-content p,
+      .home.lang-cn .about-content p {
+        line-height: 1.5;
+      }
+
+      .home.lang-ar .about-content p {
+        line-height: 1.62;
+      }
+
+      .mobile-shop {
+        display: block;
+        margin-top: 46px;
+      }
+
+    .mobile-shop-title {
+  margin: 0 0 18px 0;
+  font-size: clamp(34px, 11.5vw, 60px);
+  line-height: 0.9;
+  letter-spacing: -0.065em;
+  font-weight: 400;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+      .mobile-shop-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+        border-top: 2px solid #000000;
+        padding-top: 14px;
+      }
+
+      .mobile-shop-label {
+        display: block;
+        margin-bottom: 7px;
+        font-size: clamp(18px, 5vw, 24px);
+        line-height: 1.46;
+        letter-spacing: -0.04em;
+        font-weight: 400;
+        color: #000000;
+      }
+
+      .mobile-shop-address {
+        margin: 0;
+        font-size: clamp(12px, 3.2vw, 15px);
+        line-height: 1.24;
+        letter-spacing: -0.035em;
+      }
+
+      .home.lang-ar .mobile-shop-grid {
+        direction: rtl;
+      }
+
+      .about-close {
+        display: block;
+        top: 16px;
+        right: 18px;
+        font-size: 44px;
+      }
+
+      .home.about-open .about-close {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .khepri-ui {
+        display: none;
+      }
+
+      .language-toggle {
+        width: 56px;
+        height: 56px;
+      }
+
+      .language-button {
+        width: 54px;
+        height: 54px;
+      }
+
+      .color-switch,
+      .home.guide-complete .color-switch {
+        left: 50%;
+        right: auto;
+        bottom: max(12px, calc(env(safe-area-inset-bottom) + 10px));
+        transform: translateX(-50%);
+        z-index: 200060;
+      }
+
+      .color-button {
+        width: 54px;
+        height: 54px;
+      }
+    }
+
+    @media (max-height: 620px) and (min-width: 701px) {
+      .home,
+      .home.guide-complete {
+        --pen-rest-rotation: 90deg;
+        --pen-selected-rotation: 108deg;
+      }
+
+      .hand-inner,
+      .home.guide-complete .hand-inner {
+        transform: translateY(115%);
+        opacity: 0;
+        transition:
+          transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+          opacity 0.2s ease;
+        transition-delay: 0s;
+      }
+
+      .guide {
+        left: 4.2vw;
+        top: 24vh;
+      }
+
+      .home.lang-ar .guide {
+        left: auto;
+        right: 4.2vw;
+      }
+
+      .guide-step {
+        font-size: clamp(34px, 5.8vw, 86px);
+        line-height: 0.9;
+        letter-spacing: -0.07em;
+        margin-bottom: 10px;
+      }
+
+      .home.lang-jp .guide-step,
+      .home.lang-cn .guide-step {
+        font-size: clamp(28px, 4.8vw, 72px);
+        line-height: 1.04;
+        letter-spacing: -0.045em;
+      }
+
+      .pen-wrap,
+      .home.guide-complete .pen-wrap {
+        left: 50vw;
+        height: min(84vw, 980px);
+        top: 56vh;
+      }
+
+      .logo {
+        width: clamp(180px, 20vw, 340px);
+      }
+
+      .about-ui {
+        top: 1.4vh;
+        right: 0.8vw;
+      }
+
+      .about-art {
+        width: clamp(520px, 46vw, 760px);
+      }
+
+      .about-panel {
+        top: 39vh;
+        max-height: 45vh;
+      }
+
+      .khepri-ui {
+        display: block;
+        right: auto;
+        left: 0.8vw;
+        top: 1.4vh;
+        bottom: auto;
+        width: clamp(110px, 13vw, 190px);
+        transform: translate(-140%, -120%);
+      }
+
+      .home.guide-complete .khepri-ui {
+        transform: translate(0, 0);
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+.home.about-open .khepri-ui {
+  transform: translate(0, 0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+      .language-button {
+        width: clamp(48px, 4.8vw, 68px);
+      }
+
+      .color-button {
+        width: clamp(48px, 4.8vw, 68px);
+      }
+
+      .home.guide-complete .color-switch {
+        left: 2.2vw;
+      }
+    }
+
+
+    /* Desktop crawler mode for Khepri.
+       The beetle keeps the original mobile behavior, but on mouse-based layouts
+       it becomes a slow crawling object controlled by JS. */
+    .home.khepri-crawler-ready .khepri-ui {
+      right: auto;
+      bottom: auto;
+      left: var(--khepri-x, calc(100vw - 12vw));
+      top: var(--khepri-y, 78vh);
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transform:
+        translate(calc(100vw - var(--khepri-x, calc(100vw - 12vw)) + 50%), -50%)
+        rotate(var(--khepri-rotation, 0deg));
+      transform-origin: 50% 50%;
+      transition:
+        transform 0.78s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.22s ease;
+      will-change: left, top, transform;
+    }
+
+    .home.khepri-crawler-ready.guide-complete .khepri-ui {
+      opacity: 1;
+      transform: translate(-50%, -50%) rotate(var(--khepri-rotation, 0deg));
+      pointer-events: auto;
+      transition-delay: 0.28s;
+    }
+
+    /* After the first entrance animation, turn off transform transition so the
+       smart rotation / crawling does not feel dragged by CSS interpolation. */
+    .home.khepri-crawler-ready.khepri-crawler-entered .khepri-ui {
+      transition: opacity 0.22s ease;
+    }
+
+    /* In desktop crawler mode, About opening should not automatically hide Khepri.
+       While the user is reading and the cursor stays still, the beetle can crawl
+       toward that resting point and appear on/near the article. In pen mode it
+       stays visible above the drawing canvas, but only after the guide is fully complete. */
+    .home.khepri-crawler-ready.about-open.guide-complete .khepri-ui {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .home.khepri-crawler-ready.pen-mode.guide-complete .khepri-ui {
+      opacity: 1;
+      pointer-events: none;
+    }
+
+    /* Keep the language switch above Khepri on desktop as well. */
+    .home.khepri-crawler-ready .language-switch,
+    .home.khepri-crawler-ready .color-switch {
+      z-index: 10020;
+    }
+
+  </style>
+</head>
+
+<body>
+  <main class="home lang-en" id="home">
+    <canvas id="drawCanvas"></canvas>
+
+    <div class="logo-wrap" id="logoWrap" aria-label="Back to guide">
+      <img class="logo" src="logo.png" alt="BوB logo" />
+    </div>
+
+    <div class="hand-wrap" id="handWrap" aria-hidden="true">
+      <div class="hand-inner" id="handInner">
+        <img src="hand01.png" class="hand-frame" id="handImage" alt="" draggable="false" />
+      </div>
+    </div>
+
+    <section class="guide" id="guide" aria-hidden="true">
+      <p class="guide-step" id="guideStep1">1. PUSH THE END</p>
+      <p class="guide-step is-disabled" id="guideStep2">2. CLICK THE BODY</p>
+      <p class="guide-step is-disabled" id="guideStep3">3. HOLD TO DRAW ONE STROKE</p>
+    </section>
+
+    <div class="guide-en-steps" id="guideEnSteps" aria-hidden="true">
+      <img
+        class="guide-en-step-img"
+        id="guideEnStep1"
+        data-guide-step="1"
+        src="EN1.png"
+        alt=""
+        draggable="false"
+      />
+      <img
+        class="guide-en-step-img"
+        id="guideEnStep2"
+        data-guide-step="2"
+        src="EN2.png"
+        alt=""
+        draggable="false"
+      />
+      <img
+        class="guide-en-step-img"
+        id="guideEnStep3"
+        data-guide-step="3"
+        src="EN3.png"
+        alt=""
+        draggable="false"
+      />
+    </div>
+
+    <div class="about-ui" id="aboutUi">
+      <button class="about-button" id="aboutButton" type="button" aria-label="ABOUT US">
+        <span class="about-text" aria-hidden="true">
+          <img class="question-img question-img-normal" src="question01.png" alt="" />
+          <img class="question-img question-img-hover" src="question02.png" alt="" />
+        </span>
+
+        <span class="about-art" aria-hidden="true">
+          <img class="about-art-img about-art-normal" src="about01.png" alt="" />
+          <img class="about-art-img about-art-hover" src="about02.png" alt="" />
+          <img class="about-art-img about-art-vertical" src="about03.png" alt="" />
+        </span>
+      </button>
+    </div>
+
+    <div class="khepri-ui" id="khepriUi" aria-hidden="true">
+      <button class="khepri-button" id="khepriButton" type="button" aria-label="Copy BوB addresses">
+        <img class="khepri-img khepri-img-normal" src="khepri01.png" alt="" />
+        <img class="khepri-img khepri-img-hover" src="khepri02.png" alt="" />
+        <img class="khepri-img khepri-img-crawl-left" src="khepri_l1.png" alt="" />
+        <img class="khepri-img khepri-img-crawl-right" src="khepri_r1.png" alt="" />
+        <img class="khepri-img khepri-img-copied" src="khepri03.png" alt="" />
+      </button>
+    </div>
+
+    <div class="about-panel" id="aboutPanel" aria-hidden="true">
+      <button class="about-close" id="aboutClose" type="button">×</button>
+      <div class="about-content" id="aboutBody">
+        <h2 class="about-title">ABOUT US</h2>
+      </div>
+    </div>
+
+    <div class="language-switch" id="languageSwitch" aria-label="Language switch">
+      <button class="language-toggle" id="languageToggle" type="button" aria-label="Language">
+        <img class="lan-img lan-img-normal" src="lan01.png" alt="" />
+        <img class="lan-img lan-img-hover" src="lan02.png" alt="" />
+      </button>
+
+      <div class="language-options" id="languageOptions">
+        <button class="language-button is-active" data-lang="en" aria-label="English">
+          <img class="lang-img lang-img-normal" src="en01.png" alt="" />
+          <img class="lang-img lang-img-hover" src="en02.png" alt="" />
+        </button>
+
+        <button class="language-button" data-lang="jp" aria-label="Japanese">
+          <img class="lang-img lang-img-normal" src="jp01.png" alt="" />
+          <img class="lang-img lang-img-hover" src="jp02.png" alt="" />
+        </button>
+
+        <button class="language-button" data-lang="cn" aria-label="Chinese">
+          <img class="lang-img lang-img-normal" src="cn01.png" alt="" />
+          <img class="lang-img lang-img-hover" src="cn02.png" alt="" />
+        </button>
+
+        <button class="language-button" data-lang="ar" aria-label="Arabic">
+          <img class="lang-img lang-img-normal" src="ar01.png" alt="" />
+          <img class="lang-img lang-img-hover" src="ar02.png" alt="" />
+        </button>
+      </div>
+    </div>
+
+    <div class="color-switch" id="colorSwitch" aria-label="Pen color switch">
+      <button class="color-button is-active" data-pen-color="bw" type="button" aria-label="Black ink pen">
+        <img class="color-img" src="color_black.png" alt="" />
+      </button>
+
+      <button class="color-button" data-pen-color="bb" type="button" aria-label="Blue ink pen">
+        <img class="color-img" src="color_blue.png" alt="" />
+      </button>
+    </div>
+
+    <div class="pen-wrap" id="penWrap">
+      <img id="penImage" class="pen" src="pen_bw_1.png" alt="BوB Ballpoint Pen" draggable="false" />
+
+      <button id="pressButton" class="press-area" aria-label="Press the pen"></button>
+      <button id="bodyButton" class="body-area" aria-label="Use the pen"></button>
+    </div>
+  </main>
+
+  <script>
+    const home = document.getElementById("home");
+    const logoWrap = document.getElementById("logoWrap");
+    const penWrap = document.getElementById("penWrap");
+    const penImage = document.getElementById("penImage");
+    const pressButton = document.getElementById("pressButton");
+    const bodyButton = document.getElementById("bodyButton");
+    const canvas = document.getElementById("drawCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const guideStep1 = document.getElementById("guideStep1");
+    const guideStep2 = document.getElementById("guideStep2");
+    const guideStep3 = document.getElementById("guideStep3");
+
+    const guideEnStep1 = document.getElementById("guideEnStep1");
+    const guideEnStep2 = document.getElementById("guideEnStep2");
+    const guideEnStep3 = document.getElementById("guideEnStep3");
+    const guideEnStepImages = [guideEnStep1, guideEnStep2, guideEnStep3];
+    const guideEnDesktopSources = ["EN1.png", "EN2.png", "EN3.png"];
+    const guideEnPhoneSources = ["EN1_phone.png", "EN2_phone.png", "EN3_phone.png"];
+
+    /*
+      EN1/2/3.png are desktop layers; EN1/2/3_phone.png are phone layers.
+      Because each image still keeps its original full-canvas position,
+      the remaining steps need to be translated upward after the previous step disappears.
+      Adjust these two values if your handwriting rows need to sit higher/lower.
+    */
+    const EN_STEP_RISE_DESKTOP_VH = 12.8;
+    const EN_STEP_RISE_FLAT_VH = 13.2;
+
+    const handWrap = document.getElementById("handWrap");
+    const handImage = document.getElementById("handImage");
+
+    const languageSwitch = document.getElementById("languageSwitch");
+    const languageToggle = document.getElementById("languageToggle");
+    const languageButtons = document.querySelectorAll(".language-button");
+    const colorSwitch = document.getElementById("colorSwitch");
+    const colorButtons = document.querySelectorAll(".color-button");
+
+    const aboutButton = document.getElementById("aboutButton");
+    const aboutPanel = document.getElementById("aboutPanel");
+    const aboutClose = document.getElementById("aboutClose");
+    const aboutBody = document.getElementById("aboutBody");
+    const khepriUi = document.getElementById("khepriUi");
+    const khepriButton = document.getElementById("khepriButton");
+
+    const penAssets = {
+      bb: {
+        up: "pen_bb_1.png",
+        down: "pen_bb_2.png",
+        ink: "#005fc8",
+        mode: "blue"
+      },
+      bw: {
+        up: "pen_bw_1.png",
+        down: "pen_bw_2.png",
+        ink: "#000000",
+        mode: "black"
+      }
+    };
+
+    let currentPenColor = "bw";
+    let livingInkColor = penAssets.bw.ink;
+    let livingInkMode = penAssets.bw.mode;
+
+    const addressTextToCopy =
+`BوB Egypt Atelier
+12 Lotus Passage, El-Darb El-Ahmar, Cairo 11511, Egypt
+
+BوB Tokyo Jingumae Shop
+1-14-23 Jingumae, Shibuya-ku, Tokyo 150-0001, Japan`;
+
+    const guideTexts = {
+      en: [
+        "1. PUSH THE END",
+        "2. CLICK THE BODY",
+        "3. HOLD TO DRAW ONE STROKE"
+      ],
+      jp: [
+        "1. ペンのおしりを押す",
+        "2. ペン本体をクリック",
+        "3. 長押しして一筆描き"
+      ],
+      cn: [
+        "1. 按下笔尾",
+        "2. 点击笔身",
+        "3. 按住拖动，一笔画完"
+      ],
+      ar: [
+        "١. اضغط نهاية القلم",
+        "٢. انقر جسم القلم",
+        "٣. اضغط واسحب بخط واحد"
+      ]
+    };
+
+    const aboutTexts = {
+      en: {
+        button: "ABOUT US",
+        title: "ABOUT US",
+        shopTitle: "SHOP",
+        shopLabels: ["EGYPT", "TOKYO"],
+        shopAddresses: [
+          "12 Lotus Passage, El-Darb El-Ahmar, Cairo 11511, Egypt",
+          "1-14-23 Jingumae, Shibuya-ku, Tokyo 150-0001, Japan"
+        ],
+        paragraphs: [
+          "BوB is pronounced BwaB.",
+          "The middle letter, و, is the Arabic wa, meaning “and.”<br>So the name can be read as BwaB, or written out as B wa B.",
+          "This project began with a ballpoint pen casually bought by a friend at a small street shop during a trip to Egypt.",
+          "It was just a Made in Egypt pen.<br>But the moment I tried writing with it, I was shocked by a smoothness I had never experienced before. That physical memory stayed with me.",
+          "BوB is an experimental brand built from that sensation.",
+          "I wanted to turn the feeling of “this pen is surprisingly smooth” into something visible and playable on a website.",
+          "So the site keeps a few direct actions: press the end, pick up the pen, draw a line, change the color.<br>The moving lines and the crawling scarab both grow out of that first small moment of writing.",
+          "Even without physically using the pen, I hope the viewer can feel a trace of that magic — and begin to want to try the pen themselves."
+        ]
+      },
+
+      jp: {
+        button: "BوBについて",
+        title: "BوBについて",
+        shopTitle: "SHOP",
+        shopLabels: ["EGYPT", "TOKYO"],
+        shopAddresses: [
+          "12 Lotus Passage, El-Darb El-Ahmar, Cairo 11511, Egypt",
+          "東京都渋谷区神宮前 1-14-23"
+        ],
+        paragraphs: [
+          "BوB は、ビー・ワ・ビーと読みます",
+          "真ん中の و はアラビア語の wa で、「と／and」を意味します<br>そのため、この名前は BwaB、ビー・ワ・ビーと読みます",
+          "このプロジェクトの始まりは、友人がエジプト旅行中に街角の小さな店で何気なく買った一本のボールペンでした",
+          "それはただの Made in Egypt のペンでした<br>けれど試し書きをした瞬間、今まで経験したことのないなめらかさに驚きましたその身体的な記憶が、ずっと残りました",
+          "BوB は、その感覚から立ち上げた実験的なブランドです",
+          "「このペン、すごくなめらかだ」という感覚を、ウェブ上で見たり触ったりできるものにしたいと思いました",
+          "だからサイトには、ペンのおしりを押す、持つ、線を引く、色を変える、という直接的な動作を残しています<br>動き続ける線や小さなスカラベは、その最初の試し書きの手触りから出てきたものです",
+          "実際にそのペンを使わなくても、見た人がその魔力の一部を感じ、思わず試してみたくなるそんな仮想の実験ブランドです"
+        ]
+      },
+
+      cn: {
+        button: "关于我们",
+        title: "关于我们",
+        shopTitle: "SHOP",
+        shopLabels: ["埃及", "东京"],
+        shopAddresses: [
+          "12 Lotus Passage, El-Darb El-Ahmar, Cairo 11511, Egypt",
+          "日本东京都涩谷区神宫前 1-14-23"
+        ],
+        paragraphs: [
+          "BوB 读作 BwaB。",
+          "中间的 و 来自阿拉伯语，读作 wa，意思是“与 / 和”。<br>所以这个名字可以读作 BwaB，也可以写成 B wa B。",
+          "这个项目的起点，是一位朋友去埃及旅行时，在街边小店随手买下的一根圆珠笔。",
+          "它只是一根 Made in Egypt 的笔。<br>但我试写的瞬间，被一种从来没有体验过的顺滑度震惊了。那不是一个关于造型或包装的记忆，而是一种很直接的身体记忆，并且一直让我念念不忘。",
+          "BوB 是从这份身体记忆里生长出来的实验品牌。",
+          "我想做的，是把“这支笔太顺滑了”这件事，变成一种看得见、摸得到的网页体验。",
+          "所以网页里保留了一些很直接的动作：按下笔尾、拿起笔、画一条线、换一种颜色。<br>线条会继续动，甲虫会爬过来，都是从那一下试写的手感里长出来的。",
+          "我希望即便没有真正使用这根笔，观看者也能感受到某种来自书写的魔力，并因此很想亲手试试这支笔。"
+        ]
+      },
+
+      ar: {
+        button: "من نحن",
+        title: "من نحن",
+        shopTitle: "SHOP",
+        shopLabels: ["مصر", "طوكيو"],
+        shopAddresses: [
+          "12 Lotus Passage, El-Darb El-Ahmar, Cairo 11511, Egypt",
+          "1-14-23 Jingumae, Shibuya-ku, Tokyo 150-0001, Japan"
+        ],
+        paragraphs: [
+          "نكتب الاسم BوB، ونقرأه BwaB.",
+          "في العربية، يظهر الحرف و داخل الاسم كما هو.<br>لذلك يبدو الاسم مألوفًا قليلًا، وغريبًا قليلًا في الوقت نفسه.",
+          "بدأ هذا المشروع من قلم حبر جاف اشتراه صديق بشكل عابر من متجر صغير في الشارع أثناء رحلة إلى مصر.",
+          "كان مجرد قلم Made in Egypt.<br>لكن في اللحظة التي جرّبت الكتابة به، أدهشتني نعومة لم أختبرها من قبل. لم تكن ذكرى عن الشكل أو التغليف، بل ذكرى جسدية مباشرة بقيت معي.",
+          "BوB هو علامة تجريبية نشأت من تلك الذاكرة الجسدية.",
+          "أردت أن أجعل إحساس «هذا القلم ناعم بشكل غريب» شيئًا يمكن رؤيته وتجربته على الموقع.",
+          "لذلك بقيت في الموقع أفعال مباشرة: الضغط على نهاية القلم، حمله، رسم خط، وتغيير اللون.<br>أما الخطوط المتحركة والجعران الصغير، فقد خرجا من ملمس تلك التجربة الأولى في الكتابة.",
+          "حتى من دون استخدام القلم فعليًا، آمل أن يشعر المشاهد بجزء من تلك القوة، وأن يرغب في تجربة هذا القلم بنفسه."
+        ]
+      }
+    };
+
+    let currentLang = "en";
+
+    const ua = navigator.userAgent || "";
+    const isIOSDevice = /iPad|iPhone|iPod/.test(ua) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    const isIOSChrome = /CriOS/.test(ua);
+    const isIOSFirefox = /FxiOS/.test(ua);
+    const isIOSEdge = /EdgiOS/.test(ua);
+    const isMobileSafari = isIOSDevice && /Safari/.test(ua) &&
+      !isIOSChrome && !isIOSFirefox && !isIOSEdge;
+
+    if (isMobileSafari) {
+      home.classList.add("mobile-safari");
+    }
+
+    let isPressed = false;
+    let isSelected = false;
+    let isDrawing = false;
+    let hasMoved = false;
+    let lastPoint = null;
+
+    let step1Done = false;
+    let step2Done = false;
+    let step3Done = false;
+
+    let pointerDownX = 0;
+    let pointerDownY = 0;
+
+    let currentStroke = [];
+    let livingStroke = [];
+    let livingSegments = [];
+    let livingSegmentMeta = [];
+    let animationId = null;
+    let currentAnimationType = null;
+    let khepriLastEraseX = null;
+    let khepriLastEraseY = null;
+
+    let lastMouseX = window.innerWidth / 2;
+    let lastMouseY = window.innerHeight / 2;
+    let ignoreNextPointerUp = false;
+    let lastPointerMoveStamp = -1;
+    let lastPointerDownStamp = -1;
+    let lastPointerUpStamp = -1;
+    let ignoreUpUntil = 0;
+    let lastPenPickupTime = -1000;
+    const supportsPointerEvents = "PointerEvent" in window;
+
+    let currentHandSrc = "hand01.png";
+    let handExpanded = false;
+    let manualHandMode = false;
+    let isHandAnimating = false;
+    let lastHandClickTime = 0;
+    let handAnimationTimers = [];
+
+    let khepriCopiedTimer = null;
+
+    let khepriMobileStage = 0;
+
+    let khepriCrawlerFrameId = null;
+    let khepriMouseIdleTimer = null;
+    let khepriEnterTimer = null;
+    let khepriWindowPanicTimer = null;
+    let khepriHoverWaveDistance = 0;
+    let khepriHoverWaveLastX = null;
+    let khepriHoverWaveLastY = null;
+    let khepriHoverWaveLastTime = 0;
+    let khepriCrawlerEnabled = false;
+    let khepriPositionReady = false;
+    let khepriHovered = false;
+    let khepriCrawling = false;
+    let khepriCurrentX = 0;
+    let khepriCurrentY = 0;
+    let khepriTargetX = 0;
+    let khepriTargetY = 0;
+    let khepriPointerX = window.innerWidth * 0.5;
+    let khepriPointerY = window.innerHeight * 0.5;
+    let khepriLastFrameTime = 0;
+    let khepriLastLegSwitchTime = 0;
+    let khepriLegLeft = true;
+    let khepriPausedUntil = 0;
+    let khepriCurrentRotation = 0;
+    let khepriRotationReady = false;
+
+    const KHEPRI_MOUSE_IDLE_MS = 5000;
+    const KHEPRI_CRAWL_SPEED = 82;
+    const KHEPRI_STOP_DISTANCE = 3;
+    const KHEPRI_LEG_INTERVAL = 118;
+    const KHEPRI_ROTATE_SPEED = 520;
+    const KHEPRI_MOVE_START_ANGLE = 10;
+    const KHEPRI_ABOUT_ESCAPE_PADDING = 82;
+    const KHEPRI_ABOUT_ESCAPE_MARGIN = 54;
+    const KHEPRI_CURSOR_PAUSE_RADIUS_RATIO = 0.11;
+    const KHEPRI_CURSOR_PAUSE_MIN_RADIUS = 18;
+    const KHEPRI_WINDOW_PANIC_DELAY = 90;
+    const KHEPRI_HOVER_WAVE_DISTANCE = 86;
+    const KHEPRI_HOVER_WAVE_RESET_MS = 720;
+    const KHEPRI_HOVER_ESCAPE_DISTANCE = 320;
+
+    const KHEPRI_ERASER_RADIUS_RATIO = 0.16;
+    const KHEPRI_ERASER_BACK_OFFSET_RATIO = 0.22;
+    const KHEPRI_ERASER_MIN_MOVE = 8;
+    const KHEPRI_MIN_SEGMENT_POINTS = 5;
+
+    const moveThreshold = 5;
+    const penTipOffsetXRatio = 0.014;
+    const penTipOffsetYRatio = 0.458;
+    const inkTrailNudgeX = 4.5;
+    const inkTrailNudgeY = 2.5;
+
+    const HAND_MAX_WIDTH = 1600;
+    const HAND_MIN_WIDTH = 700;
+
+    const ABOUT_ROTATE_START = 1280;
+    const ABOUT_ROTATE_END = 760;
+    const ABOUT_VERTICAL_THRESHOLD = 45 / 90;
+
+    [
+      "EN1.png",
+      "EN2.png",
+      "EN3.png",
+      "EN1_phone.png",
+      "EN2_phone.png",
+      "EN3_phone.png",
+      "pen_bb_1.png",
+      "pen_bb_2.png",
+      "pen_bw_1.png",
+      "pen_bw_2.png",
+      "color_black.png",
+      "color_blue.png",
+      "hand01.png",
+      "hand02.png",
+      "hand03.png",
+      "hand04.png",
+      "hand05.png",
+      "hand06.png",
+      "hand07.png",
+      "hand08.png",
+      "hand09.png",
+      "hand10.png",
+      "about01.png",
+      "about02.png",
+      "about03.png",
+      "question01.png",
+      "question02.png",
+      "lan01.png",
+      "lan02.png",
+      "en01.png",
+      "en02.png",
+      "jp01.png",
+      "jp02.png",
+      "cn01.png",
+      "cn02.png",
+      "ar01.png",
+      "ar02.png",
+      "khepri01.png",
+      "khepri02.png",
+      "khepri_l1.png",
+      "khepri_r1.png",
+      "khepri03.png",
+      "logo.png"
+    ].forEach((src) => {
+      const img = new Image();
+      img.src = src;
+    });
+
+    function setHandFrame(frameNumber) {
+      const numberText = String(frameNumber).padStart(2, "0");
+      const nextSrc = `hand${numberText}.png`;
+
+      currentHandSrc = nextSrc;
+      handImage.src = nextSrc;
+    }
+
+    function getCurrentHandFrame() {
+      const match = currentHandSrc.match(/hand(0[1-9]|10)\.png/);
+      return match ? Number(match[1]) : 1;
+    }
+
+    function clearHandAnimation() {
+      handAnimationTimers.forEach((timer) => clearTimeout(timer));
+      handAnimationTimers = [];
+      isHandAnimating = false;
+    }
+
+    function playHandSequence(sequence, onComplete) {
+      clearHandAnimation();
+
+      isHandAnimating = true;
+      manualHandMode = true;
+
+      sequence.forEach((frame, index) => {
+        const timer = setTimeout(() => {
+          setHandFrame(frame);
+
+          if (index === sequence.length - 1) {
+            isHandAnimating = false;
+
+            if (typeof onComplete === "function") {
+              onComplete();
+            }
+          }
+        }, index * 38);
+
+        handAnimationTimers.push(timer);
+      });
+    }
+
+    function playHandTo10() {
+      const currentFrame = getCurrentHandFrame();
+      const start = Math.min(Math.max(currentFrame + 1, 2), 10);
+      const sequence = [];
+
+      for (let frame = start; frame <= 10; frame++) {
+        sequence.push(frame);
+      }
+
+      if (sequence.length === 0) {
+        sequence.push(10);
+      }
+
+      playHandSequence(sequence, () => {
+        handExpanded = true;
+        manualHandMode = true;
+      });
+    }
+
+    function playHandBackTo01() {
+      const currentFrame = getCurrentHandFrame();
+      const start = Math.max(Math.min(currentFrame - 1, 9), 1);
+      const sequence = [];
+
+      for (let frame = start; frame >= 1; frame--) {
+        sequence.push(frame);
+      }
+
+      if (sequence.length === 0) {
+        sequence.push(1);
+      }
+
+      playHandSequence(sequence, () => {
+        handExpanded = false;
+        manualHandMode = false;
+      });
+    }
+
+    function updateAboutTexts(lang) {
+      const data = aboutTexts[lang];
+
+      aboutButton.setAttribute("aria-label", data.button);
+
+      aboutBody.innerHTML = `
+        <h2 class="about-title">${data.title}</h2>
+        ${data.paragraphs.map((paragraph) => `<p>${paragraph}</p>`).join("")}
+
+        <section class="mobile-shop">
+          <h3 class="mobile-shop-title">${data.shopTitle}</h3>
+          <div class="mobile-shop-grid">
+            <div class="mobile-shop-item">
+              <span class="mobile-shop-label">${data.shopLabels[0]}</span>
+              <p class="mobile-shop-address">${data.shopAddresses[0]}</p>
+            </div>
+
+            <div class="mobile-shop-item">
+              <span class="mobile-shop-label">${data.shopLabels[1]}</span>
+              <p class="mobile-shop-address">${data.shopAddresses[1]}</p>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    function setLanguage(lang) {
+      currentLang = lang;
+
+      guideStep1.textContent = guideTexts[lang][0];
+      guideStep2.textContent = guideTexts[lang][1];
+      guideStep3.textContent = guideTexts[lang][2];
+
+      home.classList.remove("lang-en", "lang-jp", "lang-cn", "lang-ar");
+      home.classList.add("lang-" + lang);
+
+      document.documentElement.lang =
+        lang === "jp" ? "ja" :
+        lang === "cn" ? "zh-CN" :
+        lang === "ar" ? "ar" :
+        "en";
+
+      languageButtons.forEach((button) => {
+        button.classList.toggle("is-active", button.dataset.lang === lang);
+      });
+
+      updateAboutTexts(lang);
+
+      if (window.innerWidth <= 820) {
+        languageSwitch.classList.remove("is-open");
+      }
+    }
+
+    async function copyAddresses() {
+      try {
+        await navigator.clipboard.writeText(addressTextToCopy);
+        return true;
+      } catch (error) {
+        const textarea = document.createElement("textarea");
+        textarea.value = addressTextToCopy;
+        textarea.setAttribute("readonly", "");
+        textarea.style.position = "fixed";
+        textarea.style.left = "-9999px";
+        textarea.style.top = "-9999px";
+        document.body.appendChild(textarea);
+        textarea.select();
+
+        let copied = false;
+
+        try {
+          copied = document.execCommand("copy");
+        } catch (err) {
+          copied = false;
+        }
+
+        document.body.removeChild(textarea);
+        return copied;
+      }
+    }
+
+    function getCurrentPenAsset() {
+      return penAssets[currentPenColor] || penAssets.bb;
+    }
+
+    function getCurrentInkColor() {
+      return getCurrentPenAsset().ink;
+    }
+
+    function getCurrentInkMode() {
+      return getCurrentPenAsset().mode;
+    }
+
+    function updatePenImage() {
+      const asset = getCurrentPenAsset();
+      penImage.src = isPressed ? asset.down : asset.up;
+    }
+
+    function setPenColor(colorKey) {
+      if (!penAssets[colorKey]) return;
+
+      currentPenColor = colorKey;
+      home.classList.toggle("pen-color-bb", colorKey === "bb");
+      home.classList.toggle("pen-color-bw", colorKey === "bw");
+
+      colorButtons.forEach((button) => {
+        button.classList.toggle("is-active", button.dataset.penColor === colorKey);
+      });
+
+      updatePenImage();
+    }
+
+    colorSwitch.addEventListener("pointerdown", (event) => {
+      event.stopPropagation();
+    });
+
+    colorSwitch.addEventListener("click", (event) => {
+      event.stopPropagation();
+    });
+
+    colorButtons.forEach((button) => {
+      button.addEventListener("pointerdown", (event) => {
+        event.stopPropagation();
+      });
+
+      button.addEventListener("click", (event) => {
+        if (isSelected) {
+          event.preventDefault();
+          event.stopPropagation();
+          return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+        setPenColor(button.dataset.penColor);
+      });
+    });
+
+    languageToggle.addEventListener("pointerdown", (event) => {
+      event.stopPropagation();
+    });
+
+    languageToggle.addEventListener("click", (event) => {
+        if (isSelected) {
+  event.preventDefault();
+  event.stopPropagation();
+  return;
+}
+      event.stopPropagation();
+      languageSwitch.classList.toggle("is-open");
+    });
+
+    languageSwitch.addEventListener("pointerdown", (event) => {
+      event.stopPropagation();
+    });
+
+    languageSwitch.addEventListener("click", (event) => {
+      event.stopPropagation();
+    });
+
+    languageButtons.forEach((button) => {
+      button.addEventListener("pointerdown", (event) => {
+        event.stopPropagation();
+      });
+
+      button.addEventListener("click", (event) => {
+        event.stopPropagation();
+        setLanguage(button.dataset.lang);
+      });
+    });
+
+    function openAbout() {
+      if (!home.classList.contains("guide-complete")) return;
+
+      home.classList.add("about-open");
+      aboutButton.classList.add("is-active");
+      aboutPanel.setAttribute("aria-hidden", "false");
+
+      /* If Khepri is still sitting in the article area when About opens,
+         give it an immediate, obedient escape command. After that, the usual
+         5-second idle rule takes over again. */
+      requestAnimationFrame(() => {
+        commandKhepriAwayFromAboutIfNeeded();
+      });
+    }
+
+    function closeAbout() {
+      home.classList.remove("about-open");
+      aboutButton.classList.remove("is-active");
+      aboutPanel.setAttribute("aria-hidden", "true");
+    }
+
+    function toggleAbout() {
+      if (home.classList.contains("about-open")) {
+        closeAbout();
+      } else {
+        openAbout();
+      }
+    }
+
+    function resetGuideToStart() {
+      closeAbout();
+      putDownPen();
+      stopLivingStroke();
+      clearCanvas();
+      clearHandAnimation();
+
+      isPressed = false;
+      updatePenImage();
+
+      step1Done = false;
+      step2Done = false;
+      step3Done = false;
+
+      currentStroke = [];
+      livingStroke = [];
+      livingSegments = [];
+      livingSegmentMeta = [];
+      lastPoint = null;
+      isDrawing = false;
+      hasMoved = false;
+
+      handExpanded = false;
+      manualHandMode = false;
+      setHandFrame(1);
+
+     clearTimeout(khepriCopiedTimer);
+clearTimeout(khepriEnterTimer);
+khepriEnterTimer = null;
+home.classList.remove("khepri-crawler-entered");
+khepriMobileStage = 0;
+khepriButton.classList.remove("is-copied", "is-stage-two", "force-normal", "is-crawling", "is-crawl-left", "is-crawl-right", "is-hover-paused");
+resetKhepriCrawlerToDefault();
+
+      updateGuide();
+      resizeCanvas();
+    }
+
+    logoWrap.addEventListener("pointerdown", (event) => {
+      event.stopPropagation();
+    });
+
+    logoWrap.addEventListener("click", (event) => {
+      event.stopPropagation();
+      resetGuideToStart();
+    });
+
+    aboutButton.addEventListener("pointerdown", (event) => {
+      event.stopPropagation();
+    });
+
+    aboutButton.addEventListener("click", (event) => {
+        if (isSelected) {
+  event.preventDefault();
+  event.stopPropagation();
+  return;
+}
+      event.stopPropagation();
+      toggleAbout();
+    });
+
+    aboutPanel.addEventListener("pointerdown", (event) => {
+      event.stopPropagation();
+    });
+
+    aboutPanel.addEventListener("click", (event) => {
+      event.stopPropagation();
+    });
+
+    aboutClose.addEventListener("pointerdown", (event) => {
+      event.stopPropagation();
+    });
+
+    aboutClose.addEventListener("click", (event) => {
+      event.stopPropagation();
+      closeAbout();
+    });
+
+    khepriButton.addEventListener("pointerdown", (event) => {
+      event.stopPropagation();
+    });
+
+    khepriButton.addEventListener("pointerenter", (event) => {
+      if (!isKhepriCrawlerLayout()) return;
+
+      resetKhepriHoverWave();
+      khepriPointerX = event.clientX;
+      khepriPointerY = event.clientY;
+
+      /*
+        The PNG/button box is much larger than the visible beetle.
+        Do not stop just because the cursor enters the transparent box;
+        stop only when the beetle's visual body is really close to the cursor.
+      */
+      pauseKhepriIfCloseToPointer();
+    });
+
+    khepriButton.addEventListener("pointerleave", (event) => {
+      resetKhepriHoverWave();
+      khepriButton.classList.remove("force-normal", "is-hover-paused");
+      khepriHovered = false;
+
+      /* 离开虫子后，不继续旧路线；从离开时的鼠标位置重新开始计算。
+         之后仍然要等 5 秒不操作，虫子才会重新动。 */
+      scheduleKhepriTargetFromPointer(event.clientX, event.clientY);
+    });
+
+    khepriButton.addEventListener("pointermove", handleKhepriHoverWave);
+    khepriButton.addEventListener("mousemove", handleKhepriHoverWave);
+
+khepriButton.addEventListener("click", async (event) => {
+      if (isSelected) {
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      clearTimeout(khepriCopiedTimer);
+      pauseKhepriCrawler(3200);
+      khepriButton.classList.remove("force-normal", "is-hover-paused", "is-crawling", "is-crawl-left", "is-crawl-right");
+
+      /*
+        手机端 / 手机横屏 / 被压扁状态：
+        第一次点：01 → 02
+        第二次点：02 → 03，并复制地址
+        03 停留 3 秒后自动回到 01
+        回到 01 后可以重复同样操作
+      */
+      if (isMobileKhepriMode()) {
+        if (khepriMobileStage === 0) {
+          khepriMobileStage = 1;
+
+          khepriButton.classList.remove("is-copied", "force-normal");
+          khepriButton.classList.add("is-stage-two");
+
+          return;
+        }
+
+        if (khepriMobileStage === 1) {
+          khepriMobileStage = 2;
+
+          khepriButton.classList.remove("is-stage-two", "force-normal");
+          khepriButton.classList.add("is-copied");
+
+          await copyAddresses();
+
+          khepriCopiedTimer = setTimeout(() => {
+            khepriMobileStage = 0;
+            khepriButton.classList.remove("is-copied", "is-stage-two");
+
+            if (khepriHovered && isKhepriCrawlerLayout()) {
+              khepriButton.classList.add("is-hover-paused");
+            } else {
+              khepriButton.classList.add("force-normal");
+            }
+          }, 3000);
+
+          return;
+        }
+
+        return;
+      }
+
+      /*
+        宽屏桌面状态：
+        点击直接显示 khepri03.png，复制地址，3 秒后回到 khepri01.png。
+      */
+      khepriMobileStage = 0;
+
+      khepriButton.classList.remove("is-stage-two", "force-normal");
+      khepriButton.classList.add("is-copied");
+
+      await copyAddresses();
+
+      khepriCopiedTimer = setTimeout(() => {
+        khepriButton.classList.remove("is-copied", "is-stage-two");
+
+        if (khepriHovered && isKhepriCrawlerLayout()) {
+          khepriButton.classList.add("is-hover-paused");
+        } else {
+          khepriButton.classList.add("force-normal");
+        }
+      }, 3000);
+    });
+
+
+    handWrap.addEventListener("pointerdown", (event) => {
+      if (!home.classList.contains("guide-complete")) return;
+      if (!home.classList.contains("hand-click-ready")) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+    });
+
+    handWrap.addEventListener("dblclick", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+    });
+
+    handWrap.addEventListener("click", (event) => {
+        if (isSelected) {
+  event.preventDefault();
+  event.stopPropagation();
+  return;
+}
+      if (!home.classList.contains("guide-complete")) return;
+      if (!home.classList.contains("hand-click-ready")) return;
+      if (isHandAnimating) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      const now = Date.now();
+
+      if (now - lastHandClickTime < 180) {
+        return;
+      }
+
+      lastHandClickTime = now;
+
+      if (handExpanded || getCurrentHandFrame() >= 10) {
+        playHandBackTo01();
+      } else {
+        playHandTo10();
+      }
+    });
+
+    function clampNumber(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function normalizeDegrees(value) {
+      return ((value % 360) + 360) % 360;
+    }
+
+    function shortestAngleDelta(from, to) {
+      return ((to - from + 540) % 360) - 180;
+    }
+
+    function getKhepriRotationFromVector(dx, dy) {
+      /*
+        The default Khepri artwork faces upward.
+        atan2 gives 0deg to the right, 90deg downward, -90deg upward.
+        So we add 90deg: upward movement keeps the artwork at 0deg,
+        right movement becomes 90deg, and so on.
+      */
+      return normalizeDegrees((Math.atan2(dy, dx) * 180 / Math.PI) + 90);
+    }
+
+    function setKhepriRotation(rotation) {
+      khepriCurrentRotation = normalizeDegrees(rotation);
+      home.style.setProperty("--khepri-rotation", khepriCurrentRotation + "deg");
+    }
+
+    function turnKhepriToward(targetRotation, dt) {
+      if (!khepriRotationReady) {
+        setKhepriRotation(targetRotation);
+        khepriRotationReady = true;
+        return 0;
+      }
+
+      const diff = shortestAngleDelta(khepriCurrentRotation, targetRotation);
+      const maxTurn = KHEPRI_ROTATE_SPEED * dt;
+      const turn = Math.abs(diff) <= maxTurn ? diff : Math.sign(diff) * maxTurn;
+
+      setKhepriRotation(khepriCurrentRotation + turn);
+
+      return Math.abs(shortestAngleDelta(khepriCurrentRotation, targetRotation));
+    }
+
+    function isFlatLayout() {
+      return window.matchMedia("(max-height: 620px) and (min-width: 701px)").matches;
+    }
+
+    function isMobileKhepriMode() {
+      return (
+        window.matchMedia("(hover: none) and (pointer: coarse)").matches ||
+        window.matchMedia("(max-height: 620px) and (min-width: 701px)").matches ||
+        window.matchMedia("(max-width: 900px) and (max-height: 700px)").matches
+      );
+    }
+
+    function isKhepriCrawlerLayout() {
+      return window.innerWidth > 700 &&
+        window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    }
+
+    function getKhepriApproxSize() {
+      const rect = khepriUi.getBoundingClientRect();
+      const width = rect.width || khepriUi.offsetWidth || Math.min(Math.max(window.innerWidth * 0.18, 230), 380);
+      const height = rect.height || khepriUi.offsetHeight || width * 0.62;
+
+      return { width, height };
+    }
+
+    function clampKhepriPoint(x, y) {
+      const size = getKhepriApproxSize();
+      const margin = 16;
+      const halfW = size.width * 0.5;
+      const halfH = size.height * 0.5;
+
+      return {
+        x: clampNumber(x, halfW + margin, window.innerWidth - halfW - margin),
+        y: clampNumber(y, halfH + margin, window.innerHeight - halfH - margin)
+      };
+    }
+
+    function getDefaultKhepriPoint() {
+      const size = getKhepriApproxSize();
+
+      if (isFlatLayout()) {
+        return clampKhepriPoint(
+          window.innerWidth * 0.008 + size.width * 0.5,
+          window.innerHeight * 0.014 + size.height * 0.5
+        );
+      }
+
+      return clampKhepriPoint(
+        window.innerWidth - window.innerWidth * 0.022 - size.width * 0.5,
+        window.innerHeight - window.innerHeight * 0.12 - size.height * 0.5
+      );
+    }
+
+    function setKhepriPosition(x, y) {
+      const point = clampKhepriPoint(x, y);
+
+      khepriCurrentX = point.x;
+      khepriCurrentY = point.y;
+
+      home.style.setProperty("--khepri-x", point.x + "px");
+      home.style.setProperty("--khepri-y", point.y + "px");
+    }
+
+    function initialiseKhepriCrawlerPosition(force = false) {
+      if (!isKhepriCrawlerLayout()) return;
+      if (khepriPositionReady && !force) return;
+
+      const point = getDefaultKhepriPoint();
+
+      khepriTargetX = point.x;
+      khepriTargetY = point.y;
+      setKhepriPosition(point.x, point.y);
+
+      if (force || !khepriRotationReady) {
+        setKhepriRotation(0);
+        khepriRotationReady = true;
+      }
+
+      khepriPositionReady = true;
+    }
+
+    function clearKhepriCrawlerClasses() {
+      khepriButton.classList.remove(
+        "is-crawling",
+        "is-crawl-left",
+        "is-crawl-right"
+      );
+      khepriCrawling = false;
+    }
+
+    function setKhepriCrawlingVisual(active, time = 0) {
+      if (!active) {
+        clearKhepriCrawlerClasses();
+        return;
+      }
+
+      khepriButton.classList.remove("force-normal", "is-hover-paused");
+      khepriButton.classList.add("is-crawling");
+
+      if (!khepriCrawling || time - khepriLastLegSwitchTime > KHEPRI_LEG_INTERVAL) {
+        khepriLegLeft = !khepriLegLeft;
+        khepriLastLegSwitchTime = time;
+      }
+
+      khepriButton.classList.toggle("is-crawl-left", khepriLegLeft);
+      khepriButton.classList.toggle("is-crawl-right", !khepriLegLeft);
+      khepriCrawling = true;
+    }
+
+    function canKhepriCrawl() {
+      return khepriCrawlerEnabled &&
+        home.classList.contains("guide-complete") &&
+        !isSelected &&
+        !khepriHovered &&
+        !khepriButton.classList.contains("is-copied") &&
+        performance.now() > khepriPausedUntil;
+    }
+
+    function startKhepriCrawlerLoop() {
+      if (khepriCrawlerFrameId) return;
+      khepriLastFrameTime = 0;
+      khepriCrawlerFrameId = requestAnimationFrame(animateKhepriCrawler);
+    }
+
+    function stopKhepriCrawlerLoop() {
+      if (!khepriCrawlerFrameId) return;
+      cancelAnimationFrame(khepriCrawlerFrameId);
+      khepriCrawlerFrameId = null;
+      khepriLastFrameTime = 0;
+      clearKhepriCrawlerClasses();
+    }
+
+    function animateKhepriCrawler(time) {
+      khepriCrawlerFrameId = requestAnimationFrame(animateKhepriCrawler);
+
+      if (!canKhepriCrawl()) {
+        clearKhepriCrawlerClasses();
+        khepriLastFrameTime = time;
+        return;
+      }
+
+      initialiseKhepriCrawlerPosition();
+
+      const dt = khepriLastFrameTime ? Math.min((time - khepriLastFrameTime) / 1000, 0.05) : 0;
+      khepriLastFrameTime = time;
+
+      const dx = khepriTargetX - khepriCurrentX;
+      const dy = khepriTargetY - khepriCurrentY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      if (pauseKhepriIfCloseToPointer()) {
+        khepriLastFrameTime = time;
+        return;
+      }
+
+      if (distance <= KHEPRI_STOP_DISTANCE || dt === 0) {
+        clearKhepriCrawlerClasses();
+        return;
+      }
+
+      const targetRotation = getKhepriRotationFromVector(dx, dy);
+      const remainingRotation = turnKhepriToward(targetRotation, dt);
+
+      /*
+        To avoid the beetle looking like it is sliding sideways or walking backward,
+        it first turns its head toward the target. It only starts moving forward
+        once the body is almost aligned with the direction of travel.
+      */
+      if (remainingRotation > KHEPRI_MOVE_START_ANGLE) {
+        setKhepriCrawlingVisual(true, time);
+        return;
+      }
+
+      const step = Math.min(distance, KHEPRI_CRAWL_SPEED * dt);
+      const nextX = khepriCurrentX + (dx / distance) * step;
+      const nextY = khepriCurrentY + (dy / distance) * step;
+
+      setKhepriPosition(nextX, nextY);
+      eraseLivingStrokeByKhepriTrail(nextX, nextY, dx / distance, dy / distance);
+      setKhepriCrawlingVisual(true, time);
+    }
+
+    function updateKhepriCrawlerMode() {
+      const enabled = isKhepriCrawlerLayout();
+
+      khepriCrawlerEnabled = enabled;
+      home.classList.toggle("khepri-crawler-ready", enabled);
+
+      if (!enabled) {
+        clearTimeout(khepriMouseIdleTimer);
+        khepriMouseIdleTimer = null;
+        khepriPositionReady = false;
+        khepriHovered = false;
+        khepriRotationReady = false;
+        clearTimeout(khepriEnterTimer);
+        khepriEnterTimer = null;
+        home.classList.remove("khepri-crawler-entered");
+        setKhepriRotation(0);
+        khepriButton.classList.remove("is-hover-paused");
+        stopKhepriCrawlerLoop();
+        return;
+      }
+
+      initialiseKhepriCrawlerPosition();
+      startKhepriCrawlerLoop();
+    }
+
+    function getKhepriCursorPauseRadius() {
+      const size = getKhepriApproxSize();
+      const core = Math.min(size.width, size.height);
+      return Math.max(KHEPRI_CURSOR_PAUSE_MIN_RADIUS, core * KHEPRI_CURSOR_PAUSE_RADIUS_RATIO);
+    }
+
+    function pauseKhepriIfCloseToPointer() {
+      if (!isKhepriCrawlerLayout()) return false;
+      if (!home.classList.contains("guide-complete")) return false;
+      if (khepriHovered || isSelected) return false;
+
+      const dx = khepriPointerX - khepriCurrentX;
+      const dy = khepriPointerY - khepriCurrentY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      const radius = getKhepriCursorPauseRadius();
+
+      if (distance > radius) return false;
+
+      khepriHovered = true;
+      pauseKhepriCrawler(0);
+      khepriButton.classList.remove("force-normal", "is-crawling", "is-crawl-left", "is-crawl-right");
+
+      if (!khepriButton.classList.contains("is-copied")) {
+        khepriButton.classList.add("is-hover-paused");
+      }
+
+      return true;
+    }
+
+    function scheduleKhepriTargetFromPointer(x, y) {
+      if (!isKhepriCrawlerLayout()) return;
+
+      khepriPointerX = x;
+      khepriPointerY = y;
+
+      clearTimeout(khepriMouseIdleTimer);
+
+      khepriMouseIdleTimer = setTimeout(() => {
+        if (!isKhepriCrawlerLayout() || khepriHovered || isSelected) return;
+
+        const target = clampKhepriPoint(khepriPointerX, khepriPointerY);
+        khepriTargetX = target.x;
+        khepriTargetY = target.y;
+        startKhepriCrawlerLoop();
+      }, KHEPRI_MOUSE_IDLE_MS);
+    }
+
+    function pauseKhepriCrawler(duration = 0) {
+      khepriPausedUntil = performance.now() + duration;
+      clearTimeout(khepriMouseIdleTimer);
+      khepriMouseIdleTimer = null;
+
+      /* 暂停时把目标点重置为当前位置。
+         这样被 hover 叫停、点击复制、拿起笔暂停之后，都不会继续沿着旧路线走。 */
+      khepriTargetX = khepriCurrentX;
+      khepriTargetY = khepriCurrentY;
+
+      clearKhepriCrawlerClasses();
+    }
+
+    function getAboutReadingRect() {
+      if (window.innerWidth <= 700) return null;
+
+      const panelRect = aboutPanel.getBoundingClientRect();
+
+      /* During the slide-down transition, getBoundingClientRect can report an
+         in-between transformed position. For the escape decision we want the
+         final reading area, so this fallback mirrors the desktop CSS values. */
+      const width = Math.min(window.innerWidth * 0.44, 620);
+      const right = window.innerWidth * 0.024;
+      const top = window.innerHeight * (isFlatLayout() ? 0.37 : 0.34);
+      const height = window.innerHeight * (isFlatLayout() ? 0.55 : 0.60);
+
+      if (home.classList.contains("about-open")) {
+        return {
+          left: window.innerWidth - right - width,
+          right: window.innerWidth - right,
+          top,
+          bottom: Math.min(window.innerHeight, top + height),
+          width,
+          height: Math.min(window.innerHeight - top, height)
+        };
+      }
+
+      if (panelRect.width > 20 && panelRect.height > 20) {
+        return panelRect;
+      }
+
+      return null;
+    }
+
+    function isPointInsideRectWithPadding(x, y, rect, padding) {
+      if (!rect) return false;
+
+      return x >= rect.left - padding &&
+        x <= rect.right + padding &&
+        y >= rect.top - padding &&
+        y <= rect.bottom + padding;
+    }
+
+    function getKhepriAboutEscapePoint(rect) {
+      const size = getKhepriApproxSize();
+      const margin = KHEPRI_ABOUT_ESCAPE_MARGIN;
+
+      const candidates = [
+        {
+          x: rect.left - size.width * 0.62 - margin,
+          y: rect.top + size.height * 0.72
+        },
+        {
+          x: rect.left - size.width * 0.62 - margin,
+          y: Math.min(rect.bottom - size.height * 0.72, window.innerHeight * 0.72)
+        },
+        {
+          x: window.innerWidth * 0.24,
+          y: window.innerHeight * 0.58
+        },
+        {
+          x: window.innerWidth * 0.16,
+          y: window.innerHeight * 0.30
+        }
+      ];
+
+      for (const candidate of candidates) {
+        const point = clampKhepriPoint(candidate.x, candidate.y);
+
+        if (!isPointInsideRectWithPadding(
+          point.x,
+          point.y,
+          rect,
+          KHEPRI_ABOUT_ESCAPE_PADDING * 0.45
+        )) {
+          return point;
+        }
+      }
+
+      return clampKhepriPoint(
+        window.innerWidth * 0.18,
+        window.innerHeight * 0.50
+      );
+    }
+
+    function resetKhepriHoverWave() {
+      khepriHoverWaveDistance = 0;
+      khepriHoverWaveLastX = null;
+      khepriHoverWaveLastY = null;
+      khepriHoverWaveLastTime = 0;
+    }
+
+    function commandKhepriAwayFromPointer(x, y) {
+      if (!isKhepriCrawlerLayout()) return false;
+      if (!home.classList.contains("guide-complete")) return false;
+      if (isSelected) return false;
+
+      initialiseKhepriCrawlerPosition();
+
+      let escapePoint = null;
+      const rect = getAboutReadingRect();
+
+      if (home.classList.contains("about-open") && rect) {
+        escapePoint = getKhepriAboutEscapePoint(rect);
+      } else {
+        const dx = khepriCurrentX - x;
+        const dy = khepriCurrentY - y;
+        const len = Math.sqrt(dx * dx + dy * dy) || 1;
+        const awayX = dx / len;
+        const awayY = dy / len;
+        const side = Math.random() < 0.5 ? -1 : 1;
+
+        escapePoint = clampKhepriPoint(
+          khepriCurrentX + awayX * KHEPRI_HOVER_ESCAPE_DISTANCE + (-awayY) * 90 * side,
+          khepriCurrentY + awayY * KHEPRI_HOVER_ESCAPE_DISTANCE + awayX * 90 * side
+        );
+      }
+
+      khepriHovered = false;
+      resetKhepriHoverWave();
+      khepriButton.classList.remove("is-hover-paused", "force-normal");
+
+      commandKhepriToPoint(escapePoint.x, escapePoint.y);
+      return true;
+    }
+
+    function handleKhepriHoverWave(event) {
+      if (!isKhepriCrawlerLayout()) return;
+      if (!home.classList.contains("guide-complete")) return;
+      if (isSelected) return;
+
+      const now = performance.now();
+      const x = event.clientX;
+      const y = event.clientY;
+
+      if (
+        khepriHoverWaveLastX === null ||
+        now - khepriHoverWaveLastTime > KHEPRI_HOVER_WAVE_RESET_MS
+      ) {
+        khepriHoverWaveDistance = 0;
+      } else {
+        khepriHoverWaveDistance += Math.hypot(
+          x - khepriHoverWaveLastX,
+          y - khepriHoverWaveLastY
+        );
+      }
+
+      khepriHoverWaveLastX = x;
+      khepriHoverWaveLastY = y;
+      khepriHoverWaveLastTime = now;
+
+      if (khepriHoverWaveDistance >= KHEPRI_HOVER_WAVE_DISTANCE) {
+        commandKhepriAwayFromPointer(x, y);
+      }
+    }
+
+    function commandKhepriToPoint(x, y) {
+      if (!isKhepriCrawlerLayout()) return;
+
+      initialiseKhepriCrawlerPosition();
+
+      const target = clampKhepriPoint(x, y);
+
+      clearTimeout(khepriMouseIdleTimer);
+      khepriMouseIdleTimer = null;
+      khepriPausedUntil = 0;
+
+      khepriTargetX = target.x;
+      khepriTargetY = target.y;
+
+      khepriButton.classList.remove(
+        "force-normal",
+        "is-hover-paused",
+        "is-stage-two",
+        "is-crawling",
+        "is-crawl-left",
+        "is-crawl-right"
+      );
+
+      startKhepriCrawlerLoop();
+    }
+
+    function commandKhepriAwayFromAboutIfNeeded() {
+      if (!isKhepriCrawlerLayout()) return false;
+      if (!home.classList.contains("about-open")) return false;
+
+      initialiseKhepriCrawlerPosition();
+
+      const rect = getAboutReadingRect();
+      if (!rect) return false;
+
+      clearTimeout(khepriMouseIdleTimer);
+      khepriMouseIdleTimer = null;
+
+      const isInReadingArea = isPointInsideRectWithPadding(
+        khepriCurrentX,
+        khepriCurrentY,
+        rect,
+        KHEPRI_ABOUT_ESCAPE_PADDING
+      );
+
+      if (!isInReadingArea) {
+        return false;
+      }
+
+      const escapePoint = getKhepriAboutEscapePoint(rect);
+      commandKhepriToPoint(escapePoint.x, escapePoint.y);
+
+      return true;
+    }
+
+    function triggerKhepriWindowPanic() {
+      if (!isKhepriCrawlerLayout()) return;
+      if (!home.classList.contains("guide-complete")) return;
+      if (isSelected) return;
+
+      clearTimeout(khepriWindowPanicTimer);
+
+      khepriWindowPanicTimer = setTimeout(() => {
+        if (!isKhepriCrawlerLayout()) return;
+        if (!home.classList.contains("guide-complete")) return;
+        if (isSelected) return;
+
+        initialiseKhepriCrawlerPosition();
+        khepriHovered = false;
+        khepriButton.classList.remove("is-hover-paused", "force-normal");
+
+        const angle = Math.random() * Math.PI * 2;
+        const distance = Math.max(180, Math.min(window.innerWidth, window.innerHeight) * (0.24 + Math.random() * 0.34));
+        let targetX = khepriCurrentX + Math.cos(angle) * distance;
+        let targetY = khepriCurrentY + Math.sin(angle) * distance;
+
+        const panicPoint = clampKhepriPoint(targetX, targetY);
+        commandKhepriToPoint(panicPoint.x, panicPoint.y);
+      }, KHEPRI_WINDOW_PANIC_DELAY);
+    }
+
+    function resetKhepriCrawlerToDefault() {
+      clearTimeout(khepriMouseIdleTimer);
+      khepriMouseIdleTimer = null;
+      khepriButton.classList.remove("is-hover-paused");
+      khepriHovered = false;
+
+      if (!isKhepriCrawlerLayout()) {
+        stopKhepriCrawlerLoop();
+        khepriPositionReady = false;
+        return;
+      }
+
+      initialiseKhepriCrawlerPosition(true);
+      startKhepriCrawlerLoop();
+    }
+
+    function getSelectedPenAngle() {
+      const baseAngle = isFlatLayout() ? 90 : 0;
+      const selectedAngle = baseAngle + 18;
+      return selectedAngle * Math.PI / 180;
+    }
+
+    function updateGuideEnglishAssets() {
+      const isPhoneGuide = window.innerWidth <= 700;
+      const sources = isPhoneGuide ? guideEnPhoneSources : guideEnDesktopSources;
+
+      guideEnSteps.classList.toggle("is-phone", isPhoneGuide);
+
+      guideEnStepImages.forEach((img, index) => {
+        const nextSrc = sources[index];
+        const currentAttr = img.getAttribute("src");
+        if (currentAttr !== nextSrc) {
+          img.setAttribute("src", nextSrc);
+        }
+      });
+    }
+
+    function updateGuideEnglishSteps() {
+      const states = [
+        step1Done ? "completed" : "current",
+        !step1Done ? "disabled" : (step2Done ? "completed" : "current"),
+        !step2Done ? "disabled" : (step3Done ? "completed" : "current")
+      ];
+
+      const rise = isFlatLayout() ? EN_STEP_RISE_FLAT_VH : EN_STEP_RISE_DESKTOP_VH;
+
+      /*
+        This recreates the original typed-guide behavior:
+        when step 1 is done, step 2 and step 3 move up by one row;
+        when step 2 is also done, step 3 moves up by two rows.
+      */
+      const shiftY = [
+        0,
+        step1Done ? -rise : 0,
+        step2Done ? -rise * 2 : (step1Done ? -rise : 0)
+      ];
+
+      guideEnStepImages.forEach((img, index) => {
+        const state = states[index];
+
+        img.classList.toggle("is-current", state === "current");
+        img.classList.toggle("is-disabled", state === "disabled");
+        img.classList.toggle("is-completed", state === "completed");
+        img.style.setProperty("--en-step-shift-y", shiftY[index] + "vh");
+      });
+    }
+
+    function updateGuide() {
+      guideStep1.classList.toggle("is-completed", step1Done);
+      guideStep2.classList.toggle("is-completed", step2Done);
+      guideStep3.classList.toggle("is-completed", step3Done);
+
+      guideStep2.classList.toggle("is-disabled", !step1Done);
+      guideStep3.classList.toggle("is-disabled", !step2Done);
+
+      updateGuideEnglishAssets();
+      updateGuideEnglishSteps();
+
+      const guideComplete = step1Done && step2Done && step3Done;
+      const wasGuideComplete = home.classList.contains("guide-complete");
+      home.classList.toggle("guide-complete", guideComplete);
+
+      updateKhepriCrawlerMode();
+
+      if (guideComplete && !wasGuideComplete && isKhepriCrawlerLayout()) {
+        clearTimeout(khepriEnterTimer);
+        home.classList.remove("khepri-crawler-entered");
+
+        khepriEnterTimer = setTimeout(() => {
+          home.classList.add("khepri-crawler-entered");
+        }, 1150);
+      }
+
+      if (!guideComplete) {
+        clearTimeout(khepriEnterTimer);
+        khepriEnterTimer = null;
+        home.classList.remove("khepri-crawler-entered");
+        closeAbout();
+      }
+    }
+
+    function updateHandFrameByWidth() {
+      const w = window.innerWidth;
+      const clickReady = w > 700 && !isFlatLayout();
+
+      home.classList.toggle("hand-click-ready", clickReady);
+
+      if (isHandAnimating) {
+        return;
+      }
+
+      const progress = clampNumber(
+        (HAND_MAX_WIDTH - w) / (HAND_MAX_WIDTH - HAND_MIN_WIDTH),
+        0,
+        1
+      );
+
+      let nextFrame = 1;
+
+      /*
+        通常状态：窗口从宽到窄时，hand01 → hand05。
+        点击手之后：hand10 成为新的最宽状态，窗口从宽到窄时，hand10 → hand05。
+      */
+      if (clickReady && handExpanded) {
+        manualHandMode = true;
+
+        if (progress < 0.36) {
+          nextFrame = 10;
+        } else if (progress < 0.50) {
+          nextFrame = 9;
+        } else if (progress < 0.64) {
+          nextFrame = 8;
+        } else if (progress < 0.78) {
+          nextFrame = 7;
+        } else if (progress < 0.90) {
+          nextFrame = 6;
+        } else {
+          nextFrame = 5;
+        }
+      } else {
+        if (clickReady && manualHandMode) {
+          return;
+        }
+
+        manualHandMode = false;
+        handExpanded = false;
+
+        if (progress < 0.45) {
+          nextFrame = 1;
+        } else if (progress < 0.60) {
+          nextFrame = 2;
+        } else if (progress < 0.75) {
+          nextFrame = 3;
+        } else if (progress < 0.90) {
+          nextFrame = 4;
+        } else {
+          nextFrame = 5;
+        }
+      }
+
+      const nextSrc = `hand${String(nextFrame).padStart(2, "0")}.png`;
+
+      if (nextSrc !== currentHandSrc) {
+        setHandFrame(nextFrame);
+      }
+    }
+
+    function updateAboutRotationByWidth() {
+      const w = window.innerWidth;
+
+      const progress = clampNumber(
+        (ABOUT_ROTATE_START - w) / (ABOUT_ROTATE_START - ABOUT_ROTATE_END),
+        0,
+        1
+      );
+
+      const rotation = -90 * progress;
+      const shiftX = -44 - 120 * progress;
+      const shiftY = 70 * progress;
+
+      home.style.setProperty("--about-rotate", rotation + "deg");
+      home.style.setProperty("--about-shift-x", shiftX + "px");
+      home.style.setProperty("--about-shift-y", shiftY + "px");
+
+      home.classList.toggle(
+        "about-vertical",
+        progress > ABOUT_VERTICAL_THRESHOLD && w > 700
+      );
+    }
+
+    function resizeCanvas() {
+      const dpr = window.devicePixelRatio || 1;
+
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+
+      canvas.style.width = window.innerWidth + "px";
+      canvas.style.height = window.innerHeight + "px";
+
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      updateHandFrameByWidth();
+      updateAboutRotationByWidth();
+      updateKhepriCrawlerMode();
+
+      if (khepriCrawlerEnabled) {
+        const point = clampKhepriPoint(khepriCurrentX || getDefaultKhepriPoint().x, khepriCurrentY || getDefaultKhepriPoint().y);
+        setKhepriPosition(point.x, point.y);
+        khepriTargetX = clampNumber(khepriTargetX || point.x, point.x - window.innerWidth, window.innerWidth * 2);
+        khepriTargetY = clampNumber(khepriTargetY || point.y, point.y - window.innerHeight, window.innerHeight * 2);
+      }
+
+      if (window.innerWidth > 820) {
+        languageSwitch.classList.remove("is-open");
+      }
+
+      if (isSelected) {
+        movePenTipTo(lastMouseX, lastMouseY);
+      }
+    }
+
+    resizeCanvas();
+    updateGuide();
+    setLanguage("en");
+    setPenColor("bw");
+
+        function handleWindowResize() {
+      resizeCanvas();
+      updateGuideEnglishAssets();
+      triggerKhepriWindowPanic();
+    }
+
+    window.addEventListener("resize", handleWindowResize);
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", handleWindowResize);
+    }
+
+    window.addEventListener("focus", () => {
+      triggerKhepriWindowPanic();
+    });
+
+    function clearCanvas() {
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    }
+
+    function stopLivingStroke() {
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+        animationId = null;
+      }
+
+      khepriLastEraseX = null;
+      khepriLastEraseY = null;
+    }
+
+    function pickUpPen(mouseX, mouseY, shouldIgnoreNextPointerUp = true) {
+      isSelected = true;
+      ignoreNextPointerUp = shouldIgnoreNextPointerUp;
+      lastPenPickupTime = performance.now();
+      ignoreUpUntil = lastPenPickupTime + 520;
+      isDrawing = false;
+      hasMoved = false;
+      lastPoint = null;
+      currentStroke = [];
+      livingSegments = [];
+      livingSegmentMeta = [];
+      livingStroke = [];
+
+      lastMouseX = mouseX;
+      lastMouseY = mouseY;
+
+      stopLivingStroke();
+      clearCanvas();
+
+      pauseKhepriCrawler(0);
+
+      home.classList.add("pen-mode");
+      document.documentElement.classList.add("pen-mode-active");
+      document.body.classList.add("pen-mode-active");
+      penWrap.classList.add("is-selected");
+
+      /* 拿起笔后通常收起可能打开的 UI；但手机端 about 打开时，保留文本，让用户可以在上面乱涂乱画 */
+      const keepMobileAboutOpen = window.innerWidth <= 700 && home.classList.contains("about-open");
+
+      if (!keepMobileAboutOpen) {
+        closeAbout();
+      }
+
+      languageSwitch.classList.remove("is-open");
+
+      /* 笔被拿起的瞬间，笔尖立刻取代鼠标位置 */
+      movePenTipTo(mouseX, mouseY);
+    }
+
+    function putDownPen() {
+      isSelected = false;
+      ignoreNextPointerUp = false;
+      ignoreUpUntil = 0;
+      isDrawing = false;
+      hasMoved = false;
+      lastPoint = null;
+      currentStroke = [];
+
+      home.classList.remove("pen-mode");
+      document.documentElement.classList.remove("pen-mode-active");
+      document.body.classList.remove("pen-mode-active");
+      penWrap.classList.remove("is-selected");
+
+      penWrap.style.left = "";
+      penWrap.style.top = "";
+
+      scheduleKhepriTargetFromPointer(lastMouseX, lastMouseY);
+    }
+
+    function rotateLocalOffset(x, y, angle) {
+      return {
+        x: x * Math.cos(angle) - y * Math.sin(angle),
+        y: x * Math.sin(angle) + y * Math.cos(angle)
+      };
+    }
+
+    function getPenTipLocalOffset() {
+      return {
+        x: penWrap.offsetWidth * penTipOffsetXRatio,
+        y: penWrap.offsetHeight * penTipOffsetYRatio
+      };
+    }
+
+    function getPenTipPoint() {
+      const left = parseFloat(penWrap.style.left) || (penWrap.getBoundingClientRect().left + penWrap.getBoundingClientRect().width * 0.5);
+      const top = parseFloat(penWrap.style.top) || (penWrap.getBoundingClientRect().top + penWrap.getBoundingClientRect().height * 0.5);
+      const angle = getSelectedPenAngle();
+      const local = getPenTipLocalOffset();
+      const rotated = rotateLocalOffset(local.x, local.y, angle);
+
+      return {
+        x: left + rotated.x + inkTrailNudgeX,
+        y: top + rotated.y + inkTrailNudgeY
+      };
+    }
+
+    function movePenTipTo(mouseX, mouseY) {
+      lastMouseX = mouseX;
+      lastMouseY = mouseY;
+
+      const angle = getSelectedPenAngle();
+      const local = getPenTipLocalOffset();
+      const rotated = rotateLocalOffset(local.x, local.y, angle);
+
+      const centerX = mouseX - rotated.x - inkTrailNudgeX;
+      const centerY = mouseY - rotated.y - inkTrailNudgeY;
+
+      penWrap.style.left = centerX + "px";
+      penWrap.style.top = centerY + "px";
+    }
+
+    function lerp(a, b, t) {
+      return a + (b - a) * t;
+    }
+
+    function drawBlueBallpointSegment(from, to) {
+      ctx.beginPath();
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.lineWidth = 2.7;
+      ctx.strokeStyle = "#005fc8";
+      ctx.moveTo(from.x, from.y);
+      ctx.lineTo(to.x, to.y);
+      ctx.stroke();
+    }
+
+    function drawLine(from, to) {
+      if (getCurrentInkMode() === "blue") {
+        drawBlueBallpointSegment(from, to);
+        return;
+      }
+
+      ctx.beginPath();
+      ctx.lineWidth = 3;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.strokeStyle = getCurrentInkColor();
+      ctx.moveTo(from.x, from.y);
+      ctx.lineTo(to.x, to.y);
+      ctx.stroke();
+    }
+
+    function simplifyStroke(points, step = 2) {
+      const out = [];
+
+      for (let i = 0; i < points.length; i += step) {
+        out.push(points[i]);
+      }
+
+      if (points.length > 1 && out[out.length - 1] !== points[points.length - 1]) {
+        out.push(points[points.length - 1]);
+      }
+
+      return out;
+    }
+
+    function getNormal(points, index) {
+      const prev = points[Math.max(0, index - 1)];
+      const next = points[Math.min(points.length - 1, index + 1)];
+
+      let dx = next.x - prev.x;
+      let dy = next.y - prev.y;
+      const len = Math.sqrt(dx * dx + dy * dy) || 1;
+
+      dx /= len;
+      dy /= len;
+
+      return {
+        x: -dy,
+        y: dx
+      };
+    }
+
+    function pickRandomAnimationType() {
+      const r = Math.random();
+
+      if (r < 0.45) return "wriggle";
+      if (r < 0.8) return "pulse";
+      return "flow";
+    }
+
+    function createSegmentMeta(index = 0, preferCrazy = false, mode = livingInkMode) {
+      const isBlue = mode === "blue";
+
+      if (isBlue) {
+        const blueTypes = preferCrazy ?
+          ["blueWave", "blueWave", "bluePeak", "bluePeak", "bluePeak"] :
+          ["blueWave", "bluePeak", "blueWave"];
+        const type = blueTypes[Math.floor(Math.random() * blueTypes.length)];
+
+        return {
+          type,
+          mode,
+          color: "#005fc8",
+          seed: Math.random() * 1000 + index * 19,
+          amp: preferCrazy ? 1.25 + Math.random() * 0.95 : 0.95 + Math.random() * 0.45,
+          speed: preferCrazy ? 1.05 + Math.random() * 0.85 : 0.85 + Math.random() * 0.45,
+          sharpness: preferCrazy ? 1.35 + Math.random() * 0.95 : 0.8 + Math.random() * 0.55,
+          orbit: Math.random() * Math.PI * 2
+        };
+      }
+
+      const calmTypes = ["wriggle", "pulse", "flow"];
+
+      /*
+        After Khepri cuts a living stroke, the fragments keep the exaggerated,
+        charged movement, but they no longer turn into triangle / square / polygon
+        geometry. They remain broken lines that dance more violently.
+      */
+      const crazyTypes = [
+        "wriggle",
+        "wriggle",
+        "wriggle",
+        "pulse",
+        "pulse",
+        "flow",
+        "flow"
+      ];
+      const types = preferCrazy ? crazyTypes : calmTypes;
+      const type = types[Math.floor(Math.random() * types.length)];
+
+      return {
+        type,
+        mode,
+        color: "#000000",
+        seed: Math.random() * 1000 + index * 17,
+        amp: preferCrazy ? 1.45 + Math.random() * 0.75 : 0.85 + Math.random() * 0.45,
+        speed: preferCrazy ? 1.15 + Math.random() * 0.65 : 0.85 + Math.random() * 0.35,
+        spin: (Math.random() < 0.5 ? -1 : 1) * (0.55 + Math.random() * 0.95),
+        orbit: Math.random() * Math.PI * 2
+      };
+    }
+
+    function rebuildLivingStrokeFromSegments() {
+      livingStroke = livingSegments.flat();
+    }
+
+    function startLivingStroke(points) {
+      stopLivingStroke();
+
+      const simplified = simplifyStroke(points, 2);
+
+      if (simplified.length < 2) return;
+
+      livingInkColor = getCurrentInkColor();
+      livingInkMode = getCurrentInkMode();
+
+      livingStroke = simplified;
+      livingSegments = [simplified];
+      livingSegmentMeta = [createSegmentMeta(0, false, livingInkMode)];
+      currentAnimationType = null;
+      khepriLastEraseX = null;
+      khepriLastEraseY = null;
+      animationId = requestAnimationFrame(animateStroke);
+    }
+
+    function animateStroke(time) {
+      clearCanvas();
+
+      livingSegments = livingSegments.filter((segment) => segment.length >= 2);
+
+      if (livingSegments.length === 0) {
+        stopLivingStroke();
+        return;
+      }
+
+      livingSegments.forEach((segment, index) => {
+        if (!livingSegmentMeta[index]) {
+          livingSegmentMeta[index] = createSegmentMeta(index, true, livingInkMode);
+        }
+
+        const meta = livingSegmentMeta[index];
+
+        if (meta.type === "blueWave") {
+          drawBlueWaveStroke(time, segment, meta, index);
+        } else if (meta.type === "bluePeak") {
+          drawBluePeakStroke(time, segment, meta, index);
+        } else if (meta.type === "wriggle") {
+          drawWriggleStroke(time, segment, meta, index);
+        } else if (meta.type === "pulse") {
+          drawPulseStroke(time, segment, meta, index);
+        } else {
+          drawFlowStroke(time, segment, meta, index);
+        }
+      });
+
+      animationId = requestAnimationFrame(animateStroke);
+    }
+
+    function drawWriggleStroke(time, stroke, meta, segmentIndex = 0) {
+      ctx.beginPath();
+      ctx.lineWidth = 3;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.strokeStyle = meta.color || livingInkColor;
+
+      for (let i = 0; i < stroke.length; i++) {
+        const p = stroke[i];
+        const t = time * 0.001 * meta.speed + meta.seed;
+
+        const waveX =
+          Math.sin(t * 4.0 + i * 0.32 + segmentIndex) * 3.2 * meta.amp +
+          Math.cos(t * 2.2 + i * 0.11) * 1.4 * meta.amp;
+
+        const waveY =
+          Math.cos(t * 3.6 + i * 0.28) * 3.2 * meta.amp +
+          Math.sin(t * 2.8 + i * 0.16 + segmentIndex) * 1.4 * meta.amp;
+
+        const x = p.x + waveX;
+        const y = p.y + waveY;
+
+        if (i === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+      }
+
+      ctx.stroke();
+    }
+
+    function drawPulseStroke(time, stroke, meta, segmentIndex = 0) {
+      const count = stroke.length;
+      const centerIndex = ((time * 0.012 * meta.speed + meta.seed) % (count + 36)) - 18;
+      const sigma = Math.max(5, count * 0.08);
+
+      const transformed = [];
+
+      for (let i = 0; i < count; i++) {
+        const p = stroke[i];
+        const normal = getNormal(stroke, i);
+
+        const dist = i - centerIndex;
+        const bulge = Math.exp(-(dist * dist) / (2 * sigma * sigma));
+        const offset = bulge * 14 * meta.amp;
+
+        transformed.push({
+          x: p.x + normal.x * offset,
+          y: p.y + normal.y * offset,
+          weight: bulge
+        });
+      }
+
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.strokeStyle = meta.color || livingInkColor;
+
+      for (let i = 1; i < transformed.length; i++) {
+        const a = transformed[i - 1];
+        const b = transformed[i];
+
+        const w = 2.4 + ((a.weight + b.weight) * 0.5) * 10 * meta.amp;
+
+        ctx.beginPath();
+        ctx.lineWidth = w;
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.stroke();
+      }
+    }
+
+    function drawFlowStroke(time, stroke, meta, segmentIndex = 0) {
+      const count = stroke.length;
+      const centerIndex = ((time * 0.014 * meta.speed + meta.seed) % (count + 44)) - 22;
+      const sigma = Math.max(6, count * 0.1);
+
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.strokeStyle = meta.color || livingInkColor;
+
+      for (let i = 1; i < count; i++) {
+        const a = stroke[i - 1];
+        const b = stroke[i];
+
+        const midIndex = i - 0.5;
+        const dist = midIndex - centerIndex;
+        const focus = Math.exp(-(dist * dist) / (2 * sigma * sigma));
+
+        const lineWidth = 1.5 + focus * 11 * meta.amp;
+
+        ctx.beginPath();
+        ctx.lineWidth = lineWidth;
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.stroke();
+      }
+    }
+
+    function strokeBlueInkPolyline(points, time, meta, segmentIndex = 0, widthBonus = 0) {
+      if (points.length < 2) return;
+
+      const t = time * 0.001 * meta.speed + meta.seed;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.strokeStyle = meta.color || livingInkColor;
+
+      for (let i = 1; i < points.length; i++) {
+        const a = points[i - 1];
+        const b = points[i];
+        const progress = i / Math.max(1, points.length - 1);
+        const perspective = 0.85 + Math.pow(progress, 0.9) * (1.25 + widthBonus);
+        const pulse = 0.92 + 0.08 * Math.sin(t * 4.6 + i * 0.42 + segmentIndex + meta.orbit);
+
+        ctx.beginPath();
+        ctx.lineWidth = 1.7 + perspective * pulse;
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.stroke();
+      }
+    }
+
+    function drawBlueWaveStroke(time, stroke, meta, segmentIndex = 0) {
+      if (stroke.length < 2) return;
+
+      const points = [];
+      const t = time * 0.001 * meta.speed + meta.seed;
+      const waveLength = 0.42 + Math.sin(t * 0.7 + segmentIndex) * 0.08;
+
+      for (let i = 0; i < stroke.length; i++) {
+        const p = stroke[i];
+        const normal = getNormal(stroke, i);
+        const slowWave = Math.sin(i * waveLength + t * 4.2 + segmentIndex) * 8.2 * meta.amp;
+        const smallWave = Math.sin(i * 1.18 - t * 6.8) * 1.9 * meta.amp;
+        points.push({
+          x: p.x + normal.x * (slowWave + smallWave),
+          y: p.y + normal.y * (slowWave + smallWave)
+        });
+      }
+
+      strokeBlueInkPolyline(points, time, meta, segmentIndex, 0.1);
+    }
+
+    function drawBluePeakStroke(time, stroke, meta, segmentIndex = 0) {
+      if (stroke.length < 2) return;
+
+      const t = time * 0.001 * meta.speed + meta.seed;
+      const peakSpacing = Math.max(3, Math.round(7 - meta.sharpness * 2));
+      const points = [];
+
+      for (let i = 0; i < stroke.length; i++) {
+        const p = stroke[i];
+        const normal = getNormal(stroke, i);
+        const trianglePhase = ((i + Math.floor(t * 7)) % (peakSpacing * 2)) / peakSpacing;
+        const triangle = trianglePhase <= 1 ? trianglePhase : 2 - trianglePhase;
+        const sign = ((Math.floor((i + Math.floor(t * 4)) / peakSpacing) + segmentIndex) % 2 === 0) ? 1 : -1;
+        const spike = (triangle * 2 - 0.35) * sign * 12.6 * meta.amp * meta.sharpness;
+        const jitter = Math.sin(t * 8.4 + i * 0.73 + meta.orbit) * 1.8 * meta.amp;
+
+        points.push({
+          x: p.x + normal.x * (spike + jitter),
+          y: p.y + normal.y * (spike + jitter)
+        });
+      }
+
+      strokeBlueInkPolyline(points, time, meta, segmentIndex, 0.45);
+    }
+
+    function eraseLivingStrokeAt(x, y, radius) {
+      if (!livingSegments.length) return false;
+
+      const radiusSq = radius * radius;
+      const newSegments = [];
+      const newMeta = [];
+      let changed = false;
+
+      livingSegments.forEach((segment, segmentIndex) => {
+        let piece = [];
+
+        segment.forEach((point) => {
+          const dx = point.x - x;
+          const dy = point.y - y;
+          const shouldErase = dx * dx + dy * dy <= radiusSq;
+
+          if (shouldErase) {
+            changed = true;
+
+            if (piece.length >= KHEPRI_MIN_SEGMENT_POINTS) {
+              newSegments.push(piece);
+              newMeta.push(createSegmentMeta(newSegments.length, true, livingInkMode));
+            }
+
+            piece = [];
+          } else {
+            piece.push(point);
+          }
+        });
+
+        if (piece.length >= KHEPRI_MIN_SEGMENT_POINTS) {
+          newSegments.push(piece);
+          newMeta.push(changed ? createSegmentMeta(newSegments.length, true, livingInkMode) : (livingSegmentMeta[segmentIndex] || createSegmentMeta(segmentIndex, false, livingInkMode)));
+        }
+      });
+
+      if (!changed) return false;
+
+      livingSegments = newSegments;
+      livingSegmentMeta = newMeta;
+      rebuildLivingStrokeFromSegments();
+
+      if (livingSegments.length === 0) {
+        stopLivingStroke();
+        clearCanvas();
+      }
+
+      return true;
+    }
+
+    function eraseLivingStrokeByKhepriTrail(x, y, directionX, directionY) {
+      if (!livingSegments.length) return;
+
+      const size = getKhepriApproxSize();
+      const core = Math.min(size.width, size.height);
+      const offset = core * KHEPRI_ERASER_BACK_OFFSET_RATIO;
+      const radius = Math.max(12, core * KHEPRI_ERASER_RADIUS_RATIO);
+      const eraseX = x - directionX * offset;
+      const eraseY = y - directionY * offset;
+
+      if (khepriLastEraseX !== null) {
+        const dx = eraseX - khepriLastEraseX;
+        const dy = eraseY - khepriLastEraseY;
+        const moved = Math.sqrt(dx * dx + dy * dy);
+
+        if (moved < KHEPRI_ERASER_MIN_MOVE) return;
+      }
+
+      khepriLastEraseX = eraseX;
+      khepriLastEraseY = eraseY;
+      eraseLivingStrokeAt(eraseX, eraseY, radius);
+    }
+
+    pressButton.addEventListener("pointerdown", (event) => {
+      event.stopPropagation();
+    });
+
+    pressButton.addEventListener("mousedown", (event) => {
+      event.stopPropagation();
+    });
+
+    pressButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+
+      isPressed = !isPressed;
+      updatePenImage();
+
+      if (!step1Done) {
+        step1Done = true;
+        updateGuide();
+      }
+    });
+
+    function handleBodyPickUp(event) {
+      if (event.cancelable) {
+        event.preventDefault();
+      }
+      event.stopPropagation();
+
+      if (isSelected) return;
+
+      if (event.pointerId !== undefined && event.currentTarget && event.currentTarget.releasePointerCapture) {
+        requestAnimationFrame(() => {
+          try {
+            event.currentTarget.releasePointerCapture(event.pointerId);
+          } catch (error) {}
+        });
+      }
+
+      pickUpPen(event.clientX, event.clientY, true);
+
+      if (!step2Done && step1Done) {
+        step2Done = true;
+        updateGuide();
+      }
+    }
+
+    bodyButton.addEventListener("pointerdown", handleBodyPickUp);
+
+    /*
+      Chrome 会在 pointerdown 后额外触发 mousedown / click。
+      这些只负责拦截，不能再次改变笔的状态，否则笔会突然不像鼠标。
+    */
+    bodyButton.addEventListener("mousedown", (event) => {
+      if (event.cancelable) event.preventDefault();
+      event.stopPropagation();
+    });
+
+    bodyButton.addEventListener("click", (event) => {
+      if (event.cancelable) event.preventDefault();
+      event.stopPropagation();
+    });
+
+    function beginDrawPointer(event) {
+      if (!isSelected) {
+        if (!languageSwitch.contains(event.target) && !colorSwitch.contains(event.target)) {
+          languageSwitch.classList.remove("is-open");
+        }
+        return;
+      }
+
+      if (event.cancelable) {
+        event.preventDefault();
+      }
+
+      pointerDownX = event.clientX;
+      pointerDownY = event.clientY;
+      hasMoved = false;
+
+      movePenTipTo(event.clientX, event.clientY);
+
+      if (!isPressed) {
+        isDrawing = false;
+        lastPoint = null;
+        currentStroke = [];
+        return;
+      }
+
+      isDrawing = true;
+
+      lastPoint = getPenTipPoint();
+      currentStroke = [lastPoint];
+    }
+
+    function handlePointerMove(event) {
+      if (!isSelected) return;
+
+      lastMouseX = event.clientX;
+      lastMouseY = event.clientY;
+
+      /* 核心：笔被拿起之后，鼠标到哪里，笔尖就到哪里。 */
+      movePenTipTo(event.clientX, event.clientY);
+
+      const distanceX = event.clientX - pointerDownX;
+      const distanceY = event.clientY - pointerDownY;
+      const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+
+      if (distance > moveThreshold) {
+        hasMoved = true;
+      }
+
+      if (isDrawing && isPressed) {
+        const currentPoint = getPenTipPoint();
+
+        if (lastPoint) {
+          drawLine(lastPoint, currentPoint);
+        }
+
+        currentStroke.push(currentPoint);
+        lastPoint = currentPoint;
+      }
+    }
+
+    function finishDrawPointer(event) {
+      if (!isSelected) return;
+
+      const now = performance.now();
+
+      /* 拿起笔那一下的 mouseup / pointerup 只说明用户松开了笔身，不应该把笔放回去。 */
+      if (ignoreNextPointerUp || now <= ignoreUpUntil || now - lastPenPickupTime < 520) {
+        ignoreNextPointerUp = false;
+        hasMoved = false;
+        return;
+      }
+
+      if (!hasMoved) {
+        putDownPen();
+        return;
+      }
+
+      if (isDrawing && isPressed && currentStroke.length > 2) {
+        const strokeToAnimate = currentStroke.slice();
+
+        const shouldCompleteGuide = !step3Done && step2Done;
+
+        if (shouldCompleteGuide) {
+          step3Done = true;
+        }
+
+        putDownPen();
+
+        if (shouldCompleteGuide) {
+          updateGuide();
+        }
+
+        setTimeout(() => {
+          startLivingStroke(strokeToAnimate);
+        }, 160);
+
+        return;
+      }
+
+      putDownPen();
+    }
+
+    function handleKhepriPointerMove(event) {
+      if (!isKhepriCrawlerLayout()) return;
+      if (event.target && khepriUi.contains(event.target)) return;
+
+      scheduleKhepriTargetFromPointer(event.clientX, event.clientY);
+    }
+
+    if (supportsPointerEvents) {
+      window.addEventListener("pointermove", handleKhepriPointerMove, { passive: true });
+      window.addEventListener("pointerdown", beginDrawPointer, true);
+      document.addEventListener("pointermove", handlePointerMove, true);
+      window.addEventListener("pointerup", finishDrawPointer, true);
+    } else {
+      window.addEventListener("mousemove", handleKhepriPointerMove, false);
+      window.addEventListener("mousedown", beginDrawPointer, true);
+      document.addEventListener("mousemove", handlePointerMove, true);
+      window.addEventListener("mouseup", finishDrawPointer, true);
+    }
+
+    window.addEventListener("pointercancel", () => {
+      putDownPen();
+    });
+
+    window.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        resetGuideToStart();
+      }
+    });
+  </script>
+</body>
+</html>
