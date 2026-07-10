@@ -74,6 +74,11 @@ body.pen-mode-active * {
   cursor: none !important;
 }
 
+html.mobile-about-scroll-active,
+body.mobile-about-scroll-active {
+  touch-action: pan-y !important;
+}
+
     #drawCanvas {
       position: fixed;
       inset: 0;
@@ -216,7 +221,7 @@ body.pen-mode-active * {
     }
 
     .guide-en-steps.is-phone {
-      --en-guide-base-y: 14.5vh;
+      --en-guide-base-y: 19.5vh;
     }
 
     .guide-en-steps.is-phone .guide-en-step-img {
@@ -414,6 +419,9 @@ body.pen-mode-active * {
       width: min(44vw, 620px);
       max-height: 47vh;
       overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      touch-action: pan-y;
       z-index: 34;
       background: transparent;
       border: none;
@@ -982,6 +990,10 @@ body.pen-mode-active * {
         height: 54px;
       }
 
+      .home.about-open .color-button {
+        opacity: 1;
+      }
+
       .about-art {
         display: none;
       }
@@ -1024,7 +1036,7 @@ body.pen-mode-active * {
       .pen-wrap,
       .pen-wrap.is-selected,
       .home.pen-mode .pen-wrap {
-        z-index: 199999;
+        z-index: 200010;
       }
 
       .about-ui {
@@ -1037,7 +1049,7 @@ body.pen-mode-active * {
 
       .language-switch,
       .home.about-open .language-switch {
-        z-index: 10060;
+        z-index: 200080;
       }
 
       .about-close {
@@ -1059,6 +1071,28 @@ body.pen-mode-active * {
 
       .home.about-open .about-content {
         padding-top: max(34px, calc(env(safe-area-inset-top) + 28px));
+      }
+
+      .home.about-open #drawCanvas {
+        z-index: 10005;
+        pointer-events: none !important;
+      }
+
+      .home.about-open .pen-wrap {
+        z-index: 10006;
+        pointer-events: none !important;
+      }
+
+      .home.about-open .about-panel {
+        touch-action: pan-y;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+      }
+
+      .home.about-open .about-panel,
+      .home.about-open .about-panel * {
+        user-select: text;
+        -webkit-user-select: text;
       }
 
       .hand-wrap {
@@ -1093,6 +1127,25 @@ body.pen-mode-active * {
         top: 56.4dvh;
       }
 
+      .press-area {
+        left: 39%;
+        width: 22%;
+        top: 3%;
+        height: 15%;
+      }
+
+      .body-area {
+        left: 34%;
+        width: 32%;
+        top: 22%;
+        height: 42%;
+      }
+
+      .home.guide-complete .body-area {
+        top: 22%;
+        height: 42%;
+      }
+
       /* iOS Safari puts the browser bar at the bottom, so the same center looks visually too high.
          Only Safari gets a small downward correction; Chrome iOS keeps the original layout. */
       .home.mobile-safari .pen-wrap,
@@ -1120,7 +1173,7 @@ body.pen-mode-active * {
         height: 100dvh;
         max-height: none;
         z-index: 10030;
-        background: #ffffff;
+        background: transparent;
         transform: translateY(-105%);
         opacity: 0;
       }
@@ -1131,8 +1184,14 @@ body.pen-mode-active * {
       }
 
       .about-content {
-        padding: max(34px, calc(env(safe-area-inset-top) + 28px)) 22px 118px;
+        padding: max(34px, calc(env(safe-area-inset-top) + 28px)) 22px 132px;
         text-align: left;
+        background: linear-gradient(
+          to bottom,
+          rgba(255, 255, 255, 0.86) 0%,
+          rgba(255, 255, 255, 0.70) 42%,
+          rgba(255, 255, 255, 0.00) 100%
+        );
       }
 
       .about-title {
@@ -1255,7 +1314,7 @@ body.pen-mode-active * {
         right: auto;
         bottom: max(12px, calc(env(safe-area-inset-bottom) + 10px));
         transform: translateX(-50%);
-        z-index: 200060;
+        z-index: 200070;
       }
 
       .color-button {
@@ -1676,14 +1735,14 @@ BوB Tokyo Jingumae Shop
           "東京都渋谷区神宮前 1-14-23"
         ],
         paragraphs: [
-          "BوB は、ビー・ワ・ビーと読みます",
-          "真ん中の و はアラビア語の wa で、「と／and」を意味します<br>そのため、この名前は BwaB、ビー・ワ・ビーと読みます",
-          "このプロジェクトの始まりは、友人がエジプト旅行中に街角の小さな店で何気なく買った一本のボールペンでした",
-          "それはただの Made in Egypt のペンでした<br>けれど試し書きをした瞬間、今まで経験したことのないなめらかさに驚きましたその身体的な記憶が、ずっと残りました",
-          "BوB は、その感覚から立ち上げた実験的なブランドです",
-          "「このペン、すごくなめらかだ」という感覚を、ウェブ上で見たり触ったりできるものにしたいと思いました",
-          "だからサイトには、ペンのおしりを押す、持つ、線を引く、色を変える、という直接的な動作を残しています<br>動き続ける線や小さなスカラベは、その最初の試し書きの手触りから出てきたものです",
-          "実際にそのペンを使わなくても、見た人がその魔力の一部を感じ、思わず試してみたくなるそんな仮想の実験ブランドです"
+          "BوB は、ビー・ワ・ビーと読みます。",
+          "真ん中の و はアラビア語の wa で、「と／and」を意味します。<br>そのため、この名前は BwaB、ビー・ワ・ビーと読みます。",
+          "このプロジェクトの始まりは、友人がエジプト旅行中に街角の小さな店で何気なく買った一本のボールペンでした。",
+          "それはただの Made in Egypt のペンでした。<br>けれど試し書きをした瞬間、今まで経験したことのないなめらかさに驚きました。その身体的な記憶が、ずっと残りました。",
+          "BوB は、その感覚から立ち上げた実験的なブランドです。",
+          "「このペン、すごくなめらかだ」という感覚を、ウェブ上で見たり触ったりできるものにしたいと思いました。",
+          "だからサイトには、ペンのおしりを押す、持つ、線を引く、色を変える、という直接的な動作を残しています。<br>動き続ける線や小さなスカラベは、その最初の試し書きの手触りから出てきたものです。",
+          "実際にそのペンを使わなくても、見た人がその魔力の一部を感じ、思わず試してみたくなる。そんな仮想の実験ブランドです。"
         ]
       },
 
@@ -1711,18 +1770,18 @@ BوB Tokyo Jingumae Shop
       ar: {
         button: "من نحن",
         title: "من نحن",
-        shopTitle: "SHOP",
+        shopTitle: "المتجر",
         shopLabels: ["مصر", "طوكيو"],
         shopAddresses: [
-          "12 Lotus Passage, El-Darb El-Ahmar, Cairo 11511, Egypt",
-          "1-14-23 Jingumae, Shibuya-ku, Tokyo 150-0001, Japan"
+          "١٢ ممر لوتس، الدرب الأحمر، القاهرة ١١٥١١، مصر",
+          "١-١٤-٢٣ جينغومائه، شيبويا، طوكيو، اليابان"
         ],
         paragraphs: [
-          "نكتب الاسم BوB، ونقرأه BwaB.",
+          "نكتب الاسم BوB، ونقرأه «بي وا بي».",
           "في العربية، يظهر الحرف و داخل الاسم كما هو.<br>لذلك يبدو الاسم مألوفًا قليلًا، وغريبًا قليلًا في الوقت نفسه.",
           "بدأ هذا المشروع من قلم حبر جاف اشتراه صديق بشكل عابر من متجر صغير في الشارع أثناء رحلة إلى مصر.",
-          "كان مجرد قلم Made in Egypt.<br>لكن في اللحظة التي جرّبت الكتابة به، أدهشتني نعومة لم أختبرها من قبل. لم تكن ذكرى عن الشكل أو التغليف، بل ذكرى جسدية مباشرة بقيت معي.",
-          "BوB هو علامة تجريبية نشأت من تلك الذاكرة الجسدية.",
+          "كان مجرد قلم مصنوع في مصر.<br>لكن في اللحظة التي جرّبت الكتابة به، أدهشتني نعومة لم أختبرها من قبل. لم تكن ذكرى عن الشكل أو التغليف، بل ذكرى جسدية مباشرة بقيت معي.",
+          "هذه علامة تجريبية نشأت من تلك الذاكرة الجسدية.",
           "أردت أن أجعل إحساس «هذا القلم ناعم بشكل غريب» شيئًا يمكن رؤيته وتجربته على الموقع.",
           "لذلك بقيت في الموقع أفعال مباشرة: الضغط على نهاية القلم، حمله، رسم خط، وتغيير اللون.<br>أما الخطوط المتحركة والجعران الصغير، فقد خرجا من ملمس تلك التجربة الأولى في الكتابة.",
           "حتى من دون استخدام القلم فعليًا، آمل أن يشعر المشاهد بجزء من تلك القوة، وأن يرغب في تجربة هذا القلم بنفسه."
@@ -2091,6 +2150,10 @@ BوB Tokyo Jingumae Shop
     });
 
     colorSwitch.addEventListener("click", (event) => {
+      if (scrollMobileAboutToTop()) {
+        event.preventDefault();
+      }
+
       event.stopPropagation();
     });
 
@@ -2100,6 +2163,12 @@ BوB Tokyo Jingumae Shop
       });
 
       button.addEventListener("click", (event) => {
+        if (scrollMobileAboutToTop()) {
+          event.preventDefault();
+          event.stopPropagation();
+          return;
+        }
+
         if (isSelected) {
           event.preventDefault();
           event.stopPropagation();
@@ -2148,6 +2217,15 @@ BوB Tokyo Jingumae Shop
     function openAbout() {
       if (!home.classList.contains("guide-complete")) return;
 
+      if (window.innerWidth <= 700 && isSelected) {
+        putDownPen();
+      }
+
+      if (window.innerWidth <= 700) {
+        document.documentElement.classList.add("mobile-about-scroll-active");
+        document.body.classList.add("mobile-about-scroll-active");
+      }
+
       home.classList.add("about-open");
       aboutButton.classList.add("is-active");
       aboutPanel.setAttribute("aria-hidden", "false");
@@ -2164,6 +2242,8 @@ BوB Tokyo Jingumae Shop
       home.classList.remove("about-open");
       aboutButton.classList.remove("is-active");
       aboutPanel.setAttribute("aria-hidden", "true");
+      document.documentElement.classList.remove("mobile-about-scroll-active");
+      document.body.classList.remove("mobile-about-scroll-active");
     }
 
     function toggleAbout() {
@@ -2172,6 +2252,21 @@ BوB Tokyo Jingumae Shop
       } else {
         openAbout();
       }
+    }
+
+    function isMobileAboutOpen() {
+      return window.innerWidth <= 700 && home.classList.contains("about-open");
+    }
+
+    function scrollMobileAboutToTop() {
+      if (!isMobileAboutOpen()) return false;
+
+      aboutPanel.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+
+      return true;
     }
 
     function resetGuideToStart() {
@@ -3785,6 +3880,10 @@ khepriButton.addEventListener("click", async (event) => {
     });
 
     function beginDrawPointer(event) {
+      if (window.innerWidth <= 700 && home.classList.contains("about-open")) {
+        return;
+      }
+
       if (!isSelected) {
         if (!languageSwitch.contains(event.target) && !colorSwitch.contains(event.target)) {
           languageSwitch.classList.remove("is-open");
