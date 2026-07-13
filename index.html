@@ -165,6 +165,13 @@ body.mobile-about-scroll-active {
       color: #000000;
     }
 
+    /* Entry is intentionally language-free: the first drawn stroke unlocks it. */
+    .guide,
+    .guide-en-steps,
+    .guide-cn-steps {
+      display: none !important;
+    }
+
     /* EN handwriting guide: desktop uses EN1/2/3.png, phone uses EN1/2/3_phone.png.
        Completed steps disappear; future steps stay light gray. */
     .guide-en-steps {
@@ -180,11 +187,8 @@ body.mobile-about-scroll-active {
       --en-guide-base-y: 3.4vh;
     }
 
+    /* The four languages now share the live type guide below. */
     .home.lang-en:not(.guide-complete) .guide-en-steps {
-      display: block;
-    }
-
-    .home.lang-en .guide {
       display: none;
     }
 
@@ -228,6 +232,59 @@ body.mobile-about-scroll-active {
       object-position: center top;
     }
 
+    /* CN desktop handwriting guide: CN1.png / CN2.png / CN3.png.
+       Phone still uses the regular live text guide unless phone images are added later. */
+    .guide-cn-steps {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 3;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-select: none;
+      display: none;
+      --cn-guide-base-y: 3.4vh;
+    }
+
+    .guide-cn-step-img {
+      position: absolute;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: contain;
+      object-position: center center;
+      pointer-events: none;
+      opacity: 1;
+      transform: translateY(calc(var(--cn-guide-base-y, 0vh) + var(--cn-step-shift-y, 0vh)));
+      transition:
+        opacity 0.22s ease,
+        filter 0.22s ease,
+        transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+      will-change: opacity, transform;
+    }
+
+    .guide-cn-step-img.is-current {
+      opacity: 1;
+      filter: none;
+    }
+
+    .guide-cn-step-img.is-disabled {
+      opacity: 0.18;
+      filter: none;
+    }
+
+    .guide-cn-step-img.is-completed {
+      opacity: 0;
+      filter: none;
+    }
+
+    @media (min-width: 701px) {
+      .home.lang-cn:not(.guide-complete) .guide-cn-steps {
+        display: none;
+      }
+    }
+
     .home.lang-jp .guide {
       font-family: "Tsukushi Gothic", "筑紫ゴシック", "Yu Gothic", "YuGothic", sans-serif;
     }
@@ -245,11 +302,30 @@ body.mobile-about-scroll-active {
     }
 
     .guide-step {
+      position: relative;
+      display: table;
       margin: 0 0 10px 0;
       font-size: clamp(34px, 5.8vw, 86px);
       line-height: 0.9;
       letter-spacing: -0.07em;
-      color: #000000;
+      color: #42bdff;
+      -webkit-text-stroke: clamp(1.25px, 0.12vw, 2.2px) #000000;
+      paint-order: stroke fill;
+      /* Overlapping soft-edged bands leave small, irregular unpainted areas.
+         The glyph outline stays typographic and precise. */
+      background:
+        linear-gradient(176deg,
+          #42bdff 0 19%, transparent 19.7% 21.2%,
+          #42bdff 22% 47%, rgba(66,189,255,.72) 48% 53%,
+          #42bdff 55% 73%, transparent 73.7% 75%, #42bdff 76% 100%),
+        repeating-linear-gradient(4deg,
+          rgba(255,255,255,.22) 0 1px,
+          transparent 1px 8px);
+      background-size: 113% 100%, 100% 100%;
+      background-position: calc(var(--paint-shift, 0) * 1px) center, center;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
       transition:
         opacity 0.25s ease,
         color 0.25s ease,
@@ -270,7 +346,14 @@ body.mobile-about-scroll-active {
 
     .guide-step.is-disabled {
       color: #c8c8c8;
+      background: none;
+      -webkit-text-fill-color: #c8c8c8;
+      -webkit-text-stroke-color: #c8c8c8;
     }
+
+    .guide-step:nth-child(1) { --paint-shift: -7; }
+    .guide-step:nth-child(2) { --paint-shift: 11; }
+    .guide-step:nth-child(3) { --paint-shift: -16; }
 
     .guide-step.is-completed {
       opacity: 0;
@@ -846,6 +929,19 @@ body.mobile-about-scroll-active {
       z-index: 99999;
     }
 
+    /* Before the first stroke, nearby pointer movement agitates the resting pen. */
+    @media (hover: hover) and (pointer: fine) {
+      .home:not(.guide-complete) .pen-wrap:not(.is-selected) {
+        transform:
+          translate(
+            calc(-50% + var(--idle-shake-x, 0px)),
+            calc(-50% + var(--idle-shake-y, 0px))
+          )
+          rotate(calc(var(--pen-rest-rotation) + var(--idle-shake-r, 0deg)));
+        transition: left 0.18s ease, top 0.18s ease, height 0.18s ease;
+      }
+    }
+
     .pen {
       display: block;
       height: 100%;
@@ -858,7 +954,7 @@ body.mobile-about-scroll-active {
       top: 0;
       left: 0;
       width: 100%;
-      height: 22%;
+      height: 10%;
       cursor: pointer !important;
       z-index: 4;
       background: transparent;
@@ -873,10 +969,10 @@ body.mobile-about-scroll-active {
 
     .body-area {
       position: absolute;
-      top: 18%;
+      top: 11%;
       left: 0;
       width: 100%;
-      height: 70%;
+      height: 77%;
       cursor: pointer !important;
       z-index: 3;
       background: transparent;
@@ -1039,6 +1135,11 @@ body.mobile-about-scroll-active {
         z-index: 200010;
       }
 
+      .home:not(.guide-complete) .pen-wrap:not(.is-selected) {
+        transform: translate(-50%, -50%) rotate(var(--gyro-rotation, 0deg));
+        transition: transform 0.12s linear, left 0.18s ease, top 0.18s ease, height 0.18s ease;
+      }
+
       .about-ui {
         z-index: 10050;
       }
@@ -1131,19 +1232,19 @@ body.mobile-about-scroll-active {
         left: 39%;
         width: 22%;
         top: 3%;
-        height: 15%;
+        height: 8%;
       }
 
       .body-area {
         left: 34%;
         width: 32%;
-        top: 22%;
-        height: 42%;
+        top: 12%;
+        height: 52%;
       }
 
       .home.guide-complete .body-area {
-        top: 22%;
-        height: 42%;
+        top: 12%;
+        height: 52%;
       }
 
       /* iOS Safari puts the browser bar at the bottom, so the same center looks visually too high.
@@ -1320,6 +1421,13 @@ body.mobile-about-scroll-active {
       .color-button {
         width: 54px;
         height: 54px;
+      }
+    }
+
+    /* With the Guide gone, the unopened desktop composition is centered. */
+    @media (min-width: 701px) and (min-height: 621px) {
+      .home:not(.guide-complete) .pen-wrap {
+        top: 55vh;
       }
     }
 
@@ -1529,6 +1637,33 @@ body.mobile-about-scroll-active {
       />
     </div>
 
+    <div class="guide-cn-steps" id="guideCnSteps" aria-hidden="true">
+      <img
+        class="guide-cn-step-img"
+        id="guideCnStep1"
+        data-guide-step="1"
+        src="CN1.png"
+        alt=""
+        draggable="false"
+      />
+      <img
+        class="guide-cn-step-img"
+        id="guideCnStep2"
+        data-guide-step="2"
+        src="CN2.png"
+        alt=""
+        draggable="false"
+      />
+      <img
+        class="guide-cn-step-img"
+        id="guideCnStep3"
+        data-guide-step="3"
+        src="CN3.png"
+        alt=""
+        draggable="false"
+      />
+    </div>
+
     <div class="about-ui" id="aboutUi">
       <button class="about-button" id="aboutButton" type="button" aria-label="ABOUT US">
         <span class="about-text" aria-hidden="true">
@@ -1628,6 +1763,11 @@ body.mobile-about-scroll-active {
     const guideEnStepImages = [guideEnStep1, guideEnStep2, guideEnStep3];
     const guideEnDesktopSources = ["EN1.png", "EN2.png", "EN3.png"];
     const guideEnPhoneSources = ["EN1_phone.png", "EN2_phone.png", "EN3_phone.png"];
+
+    const guideCnStep1 = document.getElementById("guideCnStep1");
+    const guideCnStep2 = document.getElementById("guideCnStep2");
+    const guideCnStep3 = document.getElementById("guideCnStep3");
+    const guideCnStepImages = [guideCnStep1, guideCnStep2, guideCnStep3];
 
     /*
       EN1/2/3.png are desktop layers; EN1/2/3_phone.png are phone layers.
@@ -1804,14 +1944,15 @@ BوB Tokyo Jingumae Shop
       home.classList.add("mobile-safari");
     }
 
-    let isPressed = false;
+    /* The pen opens ready to write; pressing the end is now an optional discovery. */
+    let isPressed = true;
     let isSelected = false;
     let isDrawing = false;
     let hasMoved = false;
     let lastPoint = null;
 
-    let step1Done = false;
-    let step2Done = false;
+    let step1Done = true;
+    let step2Done = true;
     let step3Done = false;
 
     let pointerDownX = 0;
@@ -1872,7 +2013,7 @@ BوB Tokyo Jingumae Shop
     let khepriCurrentRotation = 0;
     let khepriRotationReady = false;
 
-    const KHEPRI_MOUSE_IDLE_MS = 5000;
+    const KHEPRI_MOUSE_IDLE_MS = 3000;
     const KHEPRI_CRAWL_SPEED = 82;
     const KHEPRI_STOP_DISTANCE = 3;
     const KHEPRI_LEG_INTERVAL = 118;
@@ -1896,7 +2037,13 @@ BوB Tokyo Jingumae Shop
     const penTipOffsetXRatio = 0.014;
     const penTipOffsetYRatio = 0.458;
     const inkTrailNudgeX = 4.5;
-    const inkTrailNudgeY = 2.5;
+    const inkTrailNudgeY = 10.5;
+
+    let idlePenShakeFrame = null;
+    let idlePenPointerX = -10000;
+    let idlePenPointerY = -10000;
+    let gyroPermissionStarted = false;
+    let gyroRotation = 0;
 
     const HAND_MAX_WIDTH = 1600;
     const HAND_MIN_WIDTH = 700;
@@ -1912,6 +2059,9 @@ BوB Tokyo Jingumae Shop
       "EN1_phone.png",
       "EN2_phone.png",
       "EN3_phone.png",
+      "CN1.png",
+      "CN2.png",
+      "CN3.png",
       "pen_bb_1.png",
       "pen_bb_2.png",
       "pen_bw_1.png",
@@ -2276,11 +2426,11 @@ BوB Tokyo Jingumae Shop
       clearCanvas();
       clearHandAnimation();
 
-      isPressed = false;
+      isPressed = true;
       updatePenImage();
 
-      step1Done = false;
-      step2Done = false;
+      step1Done = true;
+      step2Done = true;
       step3Done = false;
 
       currentStroke = [];
@@ -3110,6 +3260,31 @@ khepriButton.addEventListener("click", async (event) => {
       });
     }
 
+    function updateGuideChineseSteps() {
+      const states = [
+        step1Done ? "completed" : "current",
+        !step1Done ? "disabled" : (step2Done ? "completed" : "current"),
+        !step2Done ? "disabled" : (step3Done ? "completed" : "current")
+      ];
+
+      const rise = isFlatLayout() ? EN_STEP_RISE_FLAT_VH : EN_STEP_RISE_DESKTOP_VH;
+
+      const shiftY = [
+        0,
+        step1Done ? -rise : 0,
+        step2Done ? -rise * 2 : (step1Done ? -rise : 0)
+      ];
+
+      guideCnStepImages.forEach((img, index) => {
+        const state = states[index];
+
+        img.classList.toggle("is-current", state === "current");
+        img.classList.toggle("is-disabled", state === "disabled");
+        img.classList.toggle("is-completed", state === "completed");
+        img.style.setProperty("--cn-step-shift-y", shiftY[index] + "vh");
+      });
+    }
+
     function updateGuide() {
       guideStep1.classList.toggle("is-completed", step1Done);
       guideStep2.classList.toggle("is-completed", step2Done);
@@ -3120,6 +3295,7 @@ khepriButton.addEventListener("click", async (event) => {
 
       updateGuideEnglishAssets();
       updateGuideEnglishSteps();
+      updateGuideChineseSteps();
 
       const guideComplete = step1Done && step2Done && step3Done;
       const wasGuideComplete = home.classList.contains("guide-complete");
@@ -3263,6 +3439,88 @@ khepriButton.addEventListener("click", async (event) => {
         movePenTipTo(lastMouseX, lastMouseY);
       }
     }
+
+    function clearIdlePenShake() {
+      home.style.setProperty("--idle-shake-x", "0px");
+      home.style.setProperty("--idle-shake-y", "0px");
+      home.style.setProperty("--idle-shake-r", "0deg");
+    }
+
+    function animateIdlePenShake(time) {
+      const desktopPointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+      const active = desktopPointer && !isSelected && !home.classList.contains("guide-complete");
+
+      if (!active) {
+        clearIdlePenShake();
+        idlePenShakeFrame = requestAnimationFrame(animateIdlePenShake);
+        return;
+      }
+
+      const rect = penWrap.getBoundingClientRect();
+      const centerX = rect.left + rect.width * 0.5;
+      const centerY = rect.top + rect.height * 0.5;
+      const distance = Math.hypot(idlePenPointerX - centerX, idlePenPointerY - centerY);
+      const influenceRadius = Math.max(360, Math.min(window.innerWidth, window.innerHeight) * 0.62);
+      const proximity = Math.pow(clampNumber(1 - distance / influenceRadius, 0, 1), 1.7);
+
+      /* Two mismatched frequencies keep the movement physical and slightly uncanny. */
+      const x = (Math.sin(time * 0.071) + Math.sin(time * 0.113 + 1.7) * 0.55) * 1.55 * proximity;
+      const y = (Math.sin(time * 0.083 + 2.1) + Math.sin(time * 0.137) * 0.42) * 1.25 * proximity;
+      const rotation = (Math.sin(time * 0.061 + 0.8) + Math.sin(time * 0.127) * 0.35) * 0.34 * proximity;
+
+      home.style.setProperty("--idle-shake-x", x.toFixed(3) + "px");
+      home.style.setProperty("--idle-shake-y", y.toFixed(3) + "px");
+      home.style.setProperty("--idle-shake-r", rotation.toFixed(3) + "deg");
+      idlePenShakeFrame = requestAnimationFrame(animateIdlePenShake);
+    }
+
+    function handlePenDeviceOrientation(event) {
+      if (window.innerWidth > 700 || isSelected || home.classList.contains("guide-complete")) {
+        gyroRotation += (0 - gyroRotation) * 0.18;
+        home.style.setProperty("--gyro-rotation", gyroRotation.toFixed(2) + "deg");
+        return;
+      }
+
+      const portrait = window.innerHeight >= window.innerWidth;
+      const rawTilt = portrait ? event.gamma : event.beta;
+      if (typeof rawTilt !== "number" || !Number.isFinite(rawTilt)) return;
+
+      const orientationSign = portrait || window.orientation === 90 ? 1 : -1;
+      const target = clampNumber(rawTilt * 0.58 * orientationSign, -24, 24);
+      gyroRotation += (target - gyroRotation) * 0.16;
+      home.style.setProperty("--gyro-rotation", gyroRotation.toFixed(2) + "deg");
+    }
+
+    async function enablePenGyroscope() {
+      if (gyroPermissionStarted || window.innerWidth > 700 || !("DeviceOrientationEvent" in window)) return;
+      gyroPermissionStarted = true;
+
+      try {
+        if (typeof DeviceOrientationEvent.requestPermission === "function") {
+          const permission = await DeviceOrientationEvent.requestPermission();
+          if (permission !== "granted") return;
+        }
+        window.addEventListener("deviceorientation", handlePenDeviceOrientation, { passive: true });
+      } catch (error) {
+        /* The pen remains static when motion access is unavailable or declined. */
+      }
+    }
+
+    /* iOS requires this request to happen inside the user's first gesture. */
+    window.addEventListener("pointerdown", enablePenGyroscope, { once: true, passive: true });
+
+    /* Browsers without a permission prompt can begin listening immediately. */
+    if (!(typeof DeviceOrientationEvent !== "undefined" &&
+          typeof DeviceOrientationEvent.requestPermission === "function")) {
+      enablePenGyroscope();
+    }
+
+    window.addEventListener("pointermove", (event) => {
+      idlePenPointerX = event.clientX;
+      idlePenPointerY = event.clientY;
+    }, { passive: true });
+
+    idlePenShakeFrame = requestAnimationFrame(animateIdlePenShake);
 
     resizeCanvas();
     updateGuide();
