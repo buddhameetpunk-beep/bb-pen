@@ -578,6 +578,10 @@ body.mobile-about-scroll-active {
       display: none;
     }
 
+    .mobile-guide-section {
+      display: none;
+    }
+
     .about-close {
       display: none;
       position: fixed;
@@ -1170,6 +1174,11 @@ body.mobile-about-scroll-active {
         pointer-events: none;
       }
 
+      /* Mobile uses the single lower-left question button for Guide/About/Shop. */
+      .about-ui {
+        display: none !important;
+      }
+
       .home.about-open .about-content {
         padding-top: max(34px, calc(env(safe-area-inset-top) + 28px));
       }
@@ -1184,13 +1193,6 @@ body.mobile-about-scroll-active {
         z-index: 10006;
         opacity: 0;
         pointer-events: none !important;
-      }
-
-      .home.about-open.about-tip-reveal .pen-wrap {
-        z-index: 10035;
-        opacity: 1;
-        clip-path: inset(91% 0 0 0);
-        -webkit-clip-path: inset(91% 0 0 0);
       }
 
       .home.about-open .about-panel {
@@ -1302,9 +1304,9 @@ body.mobile-about-scroll-active {
       .about-title {
         display: block;
         text-align: left;
-        border-bottom: 2px solid #000000;
-        padding-bottom: 14px;
-        margin: 0 56px 24px 0;
+        border-bottom: 0;
+        padding-bottom: 0;
+        margin: 0 0 18px;
 
         font-size: clamp(34px, 11.5vw, 60px);
         line-height: 0.9;
@@ -1325,7 +1327,12 @@ body.mobile-about-scroll-active {
 
       .home.lang-ar .about-title {
         text-align: right;
-        margin: 0 0 24px 56px;
+        margin: 0 0 18px;
+      }
+
+      .about-paragraphs {
+        border-top: 2px solid #000;
+        padding-top: 16px;
       }
 
       .about-content p {
@@ -1347,6 +1354,23 @@ body.mobile-about-scroll-active {
       .mobile-shop {
         display: block;
         margin-top: 46px;
+      }
+
+      .mobile-guide-section {
+        display: block;
+        margin-bottom: 46px;
+      }
+
+      .mobile-guide-title {
+        margin: 0 0 18px;
+        padding-bottom: 14px;
+        border-bottom: 2px solid #000;
+        font: 400 clamp(34px, 11.5vw, 60px)/.9 "Helvetica Neue", Arial, sans-serif;
+        letter-spacing: -.065em;
+      }
+
+      .mobile-guide-section p:last-child {
+        margin-bottom: 0;
       }
 
     .mobile-shop-title {
@@ -1605,10 +1629,6 @@ body.mobile-about-scroll-active {
         display: block;
       }
 
-      .home.guide-complete .mobile-help {
-        display: none;
-      }
-
       .mobile-help-button {
         position: relative;
         width: 52px;
@@ -1626,8 +1646,8 @@ body.mobile-about-scroll-active {
         object-fit: contain;
       }
       .mobile-help-icon-open { display: none; }
-      .mobile-help.is-open .mobile-help-icon-normal { display: none; }
-      .mobile-help.is-open .mobile-help-icon-open { display: block; }
+      .home.about-open .mobile-help-icon-normal { display: none; }
+      .home.about-open .mobile-help-icon-open { display: block; }
 
       .mobile-help-panel {
         position: fixed;
@@ -1975,21 +1995,25 @@ BوB Tokyo Jingumae Shop
 
     const mobileGuideTexts = {
       en: {
+        title: "CREATE WITH ME",
         steps: ["Tap the pen body and try picking it up.", "Press and hold to begin creating. Draw a stroke that is uniquely yours. Release to finish.", "Pick up the pen again, and your previous drawing will be cleared."],
         prompt: "Let the pen respond to the way you tilt your phone?",
         enable: "ENABLE", later: "LATER", label: "How to use"
       },
       jp: {
+        title: "私を使って創作",
         steps: ["ペン本体をタップして、持ち上げてみてください。", "長押しして創作を始め、あなただけの一筆を描いてください。指を離すと完成です。", "もう一度ペンを持ち上げると、前の作品は消去されます。"],
         prompt: "スマートフォンの傾きにペンを反応させますか？",
         enable: "オンにする", later: "あとで", label: "使い方"
       },
       cn: {
+        title: "用我创作",
         steps: ["点击笔身，试试拿起这支笔。", "按住开始创作，画下专属于你的一笔。松手即完成。", "再次拿起笔，上一幅将会被清除。"],
         prompt: "让笔感应手机左右倾斜的方向吗？",
         enable: "开启", later: "稍后", label: "使用方法"
       },
       ar: {
+        title: "أبدع بي",
         steps: ["المس جسم القلم وجرّب أن ترفعه.", "اضغط باستمرار لتبدأ الإبداع، وارسم خطاً يخصك وحدك. ارفع إصبعك ليكتمل.", "عندما ترفع القلم مرة أخرى، سيُمسح عملك السابق."],
         prompt: "هل تريد أن يستجيب القلم لإمالة هاتفك؟",
         enable: "تشغيل", later: "لاحقاً", label: "طريقة الاستخدام"
@@ -2343,12 +2367,20 @@ BوB Tokyo Jingumae Shop
 
     function updateAboutTexts(lang) {
       const data = aboutTexts[lang];
+      const guideData = mobileGuideTexts[lang];
 
       aboutButton.setAttribute("aria-label", data.button);
 
       aboutBody.innerHTML = `
+        <section class="mobile-guide-section">
+          <h2 class="mobile-guide-title">${guideData.title}</h2>
+          ${guideData.steps.map((step) => `<p>${step}</p>`).join("")}
+        </section>
+
         <h2 class="about-title">${data.title}</h2>
-        ${data.paragraphs.map((paragraph) => `<p>${paragraph}</p>`).join("")}
+        <div class="about-paragraphs">
+          ${data.paragraphs.map((paragraph) => `<p>${paragraph}</p>`).join("")}
+        </div>
 
         <section class="mobile-shop">
           <h3 class="mobile-shop-title">${data.shopTitle}</h3>
@@ -2403,7 +2435,7 @@ BوB Tokyo Jingumae Shop
 
     mobileHelpButton.addEventListener("click", (event) => {
       event.stopPropagation();
-      mobileHelp.classList.toggle("is-open");
+      toggleAbout();
     });
 
     mobileHelpPanel.addEventListener("pointerdown", (event) => event.stopPropagation());
@@ -2547,7 +2579,7 @@ BوB Tokyo Jingumae Shop
     });
 
     function openAbout() {
-      if (!home.classList.contains("guide-complete")) return;
+      if (window.innerWidth > 700 && !home.classList.contains("guide-complete")) return;
 
       if (window.innerWidth <= 700 && isSelected) {
         putDownPen();
@@ -2572,18 +2604,11 @@ BوB Tokyo Jingumae Shop
 
     function closeAbout() {
       home.classList.remove("about-open");
-      home.classList.remove("about-tip-reveal");
       aboutButton.classList.remove("is-active");
       aboutPanel.setAttribute("aria-hidden", "true");
       document.documentElement.classList.remove("mobile-about-scroll-active");
       document.body.classList.remove("mobile-about-scroll-active");
     }
-
-    aboutPanel.addEventListener("scroll", () => {
-      if (window.innerWidth > 700 || !home.classList.contains("about-open")) return;
-      const remaining = aboutPanel.scrollHeight - aboutPanel.clientHeight - aboutPanel.scrollTop;
-      home.classList.toggle("about-tip-reveal", remaining < 90);
-    }, { passive: true });
 
     function toggleAbout() {
       if (home.classList.contains("about-open")) {
