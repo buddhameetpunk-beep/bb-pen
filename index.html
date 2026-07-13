@@ -1587,6 +1587,88 @@ body.mobile-about-scroll-active {
       z-index: 10020;
     }
 
+    .mobile-help,
+    .motion-prompt {
+      display: none;
+    }
+
+    @media (max-width: 700px) {
+      .mobile-help {
+        position: fixed;
+        left: 14px;
+        bottom: max(14px, env(safe-area-inset-bottom));
+        z-index: 200090;
+        display: block;
+      }
+
+      .mobile-help-button {
+        width: 52px;
+        height: 52px;
+        border: 2px solid #000;
+        border-radius: 50%;
+        background: #fff;
+        color: #000;
+        font: 400 31px/1 "Helvetica Neue", Arial, sans-serif;
+      }
+
+      .mobile-help-panel {
+        position: absolute;
+        left: 0;
+        bottom: 62px;
+        width: min(82vw, 330px);
+        padding: 18px 20px;
+        border: 2px solid #000;
+        background: #fff;
+        font: 400 17px/1.25 "Helvetica Neue", Arial, sans-serif;
+        opacity: 0;
+        transform: translateY(8px);
+        pointer-events: none;
+        transition: opacity .18s ease, transform .18s ease;
+      }
+
+      .mobile-help.is-open .mobile-help-panel {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+      }
+
+      .mobile-help-panel p { margin: 0 0 10px; }
+      .mobile-help-panel p:last-child { margin-bottom: 0; }
+      .home.lang-ar .mobile-help-panel { direction: rtl; text-align: right; }
+
+      .motion-prompt {
+        position: fixed;
+        inset: 0;
+        z-index: 300000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        background: rgba(255,255,255,.72);
+      }
+
+      .motion-prompt.is-hidden { display: none; }
+      .motion-prompt-card {
+        width: min(88vw, 360px);
+        padding: 22px;
+        border: 2px solid #000;
+        background: #fff;
+        font: 400 18px/1.25 "Helvetica Neue", Arial, sans-serif;
+      }
+      .motion-prompt-text { margin: 0 0 18px; }
+      .motion-prompt-actions { display: flex; gap: 10px; }
+      .motion-prompt button {
+        flex: 1;
+        min-height: 44px;
+        border: 2px solid #000;
+        background: #fff;
+        color: #000;
+        font: inherit;
+      }
+      .motion-prompt-enable { background: #42bdff !important; }
+      .home.lang-ar .motion-prompt-card { direction: rtl; text-align: right; }
+    }
+
   </style>
 </head>
 
@@ -1725,6 +1807,21 @@ body.mobile-about-scroll-active {
       </div>
     </div>
 
+    <div class="mobile-help" id="mobileHelp">
+      <button class="mobile-help-button" id="mobileHelpButton" type="button" aria-label="How to use">?</button>
+      <div class="mobile-help-panel" id="mobileHelpPanel"></div>
+    </div>
+
+    <div class="motion-prompt" id="motionPrompt" role="dialog" aria-modal="true">
+      <div class="motion-prompt-card">
+        <p class="motion-prompt-text" id="motionPromptText"></p>
+        <div class="motion-prompt-actions">
+          <button class="motion-prompt-enable" id="motionPromptEnable" type="button"></button>
+          <button id="motionPromptLater" type="button"></button>
+        </div>
+      </div>
+    </div>
+
     <div class="color-switch" id="colorSwitch" aria-label="Pen color switch">
       <button class="color-button is-active" data-pen-color="bw" type="button" aria-label="Black ink pen">
         <img class="color-img" src="color_black.png" alt="" />
@@ -1793,6 +1890,13 @@ body.mobile-about-scroll-active {
     const aboutBody = document.getElementById("aboutBody");
     const khepriUi = document.getElementById("khepriUi");
     const khepriButton = document.getElementById("khepriButton");
+    const mobileHelp = document.getElementById("mobileHelp");
+    const mobileHelpButton = document.getElementById("mobileHelpButton");
+    const mobileHelpPanel = document.getElementById("mobileHelpPanel");
+    const motionPrompt = document.getElementById("motionPrompt");
+    const motionPromptText = document.getElementById("motionPromptText");
+    const motionPromptEnable = document.getElementById("motionPromptEnable");
+    const motionPromptLater = document.getElementById("motionPromptLater");
 
     const penAssets = {
       bb: {
@@ -1841,6 +1945,29 @@ BوB Tokyo Jingumae Shop
         "٢. انقر جسم القلم",
         "٣. اضغط واسحب بخط واحد"
       ]
+    };
+
+    const mobileGuideTexts = {
+      en: {
+        steps: ["1. Tap the pen body to pick it up.", "2. Hold and draw one stroke to enter.", "3. The end of the pen can also be pressed.", "4. Try tilting your phone left and right."],
+        prompt: "Let the pen respond to the way you tilt your phone?",
+        enable: "ENABLE", later: "LATER", label: "How to use"
+      },
+      jp: {
+        steps: ["1. ペン本体をタップして持ち上げます。", "2. 長押しして一筆描くと、ページに入れます。", "3. ペンのおしりも押せます。", "4. スマートフォンを左右に傾けてみてください。"],
+        prompt: "スマートフォンの傾きにペンを反応させますか？",
+        enable: "オンにする", later: "あとで", label: "使い方"
+      },
+      cn: {
+        steps: ["1. 点击笔身，把笔拿起来。", "2. 按住画完一笔，即可进入页面。", "3. 笔尾也可以按。", "4. 试着左右倾斜手机。"],
+        prompt: "让笔感应手机左右倾斜的方向吗？",
+        enable: "开启", later: "稍后", label: "使用方法"
+      },
+      ar: {
+        steps: ["١. المس جسم القلم لرفعه.", "٢. اضغط وارسم خطاً واحداً للدخول.", "٣. يمكن أيضاً ضغط نهاية القلم.", "٤. جرّب إمالة الهاتف يميناً ويساراً."],
+        prompt: "هل تريد أن يستجيب القلم لإمالة هاتفك؟",
+        enable: "تشغيل", later: "لاحقاً", label: "طريقة الاستخدام"
+      }
     };
 
     const aboutTexts = {
@@ -2233,10 +2360,35 @@ BوB Tokyo Jingumae Shop
 
       updateAboutTexts(lang);
 
+      const mobileData = mobileGuideTexts[lang];
+      mobileHelpPanel.innerHTML = mobileData.steps.map((step) => `<p>${step}</p>`).join("");
+      mobileHelpButton.setAttribute("aria-label", mobileData.label);
+      motionPromptText.textContent = mobileData.prompt;
+      motionPromptEnable.textContent = mobileData.enable;
+      motionPromptLater.textContent = mobileData.later;
+
       if (window.innerWidth <= 820) {
         languageSwitch.classList.remove("is-open");
       }
     }
+
+    mobileHelpButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      mobileHelp.classList.toggle("is-open");
+    });
+
+    mobileHelpPanel.addEventListener("pointerdown", (event) => event.stopPropagation());
+
+    motionPromptEnable.addEventListener("click", async (event) => {
+      event.stopPropagation();
+      await enablePenGyroscope();
+      motionPrompt.classList.add("is-hidden");
+    });
+
+    motionPromptLater.addEventListener("click", (event) => {
+      event.stopPropagation();
+      motionPrompt.classList.add("is-hidden");
+    });
 
     async function copyAddresses() {
       try {
@@ -3487,8 +3639,9 @@ khepriButton.addEventListener("click", async (event) => {
       if (typeof rawTilt !== "number" || !Number.isFinite(rawTilt)) return;
 
       const orientationSign = portrait || window.orientation === 90 ? 1 : -1;
-      const target = clampNumber(rawTilt * 0.58 * orientationSign, -24, 24);
-      gyroRotation += (target - gyroRotation) * 0.16;
+      const tiltAfterDeadZone = Math.abs(rawTilt) < 3 ? 0 : rawTilt - Math.sign(rawTilt) * 3;
+      const target = clampNumber(-tiltAfterDeadZone * orientationSign, -24, 24);
+      gyroRotation += (target - gyroRotation) * 0.045;
       home.style.setProperty("--gyro-rotation", gyroRotation.toFixed(2) + "deg");
     }
 
@@ -3512,11 +3665,6 @@ khepriButton.addEventListener("click", async (event) => {
         gyroPermissionPending = false;
       }
     }
-
-    /* Capture runs before the pen buttons stop propagation. iOS requires a user gesture. */
-    window.addEventListener("pointerdown", enablePenGyroscope, { capture: true, passive: true });
-    window.addEventListener("touchend", enablePenGyroscope, { capture: true, passive: true });
-    window.addEventListener("click", enablePenGyroscope, { capture: true, passive: true });
 
     /* Browsers without a permission prompt can begin listening immediately. */
     if (!(typeof DeviceOrientationEvent !== "undefined" &&
