@@ -1605,6 +1605,10 @@ body.mobile-about-scroll-active {
         display: block;
       }
 
+      .home.guide-complete .mobile-help {
+        display: none;
+      }
+
       .mobile-help-button {
         position: relative;
         width: 52px;
@@ -1971,22 +1975,22 @@ BوB Tokyo Jingumae Shop
 
     const mobileGuideTexts = {
       en: {
-        steps: ["Tap the pen body to pick it up and use it.", "Hold and complete one continuous stroke. Please note: picking up the pen again clears the previous drawing.", "Try tilting your phone left and right."],
+        steps: ["Tap the pen body and try picking it up.", "Press and hold to begin creating. Draw a stroke that is uniquely yours. Release to finish.", "Pick up the pen again, and your previous drawing will be cleared."],
         prompt: "Let the pen respond to the way you tilt your phone?",
         enable: "ENABLE", later: "LATER", label: "How to use"
       },
       jp: {
-        steps: ["ペン本体をタップすると、持ち上げて使えます。", "長押ししたまま、一筆で描き切ってください。もう一度ペンを持ち上げると、前に描いた図形は消えます。", "スマートフォンを左右に傾けてみてください。"],
+        steps: ["ペン本体をタップして、持ち上げてみてください。", "長押しして創作を始め、あなただけの一筆を描いてください。指を離すと完成です。", "もう一度ペンを持ち上げると、前の作品は消去されます。"],
         prompt: "スマートフォンの傾きにペンを反応させますか？",
         enable: "オンにする", later: "あとで", label: "使い方"
       },
       cn: {
-        steps: ["点击笔身可以把笔拿起来使用哦。", "按住并一笔画完，请注意再次拿起笔会清除之前的图形。", "可以试着左右倾斜手机。"],
+        steps: ["点击笔身，试试拿起这支笔。", "按住开始创作，画下专属于你的一笔。松手即完成。", "再次拿起笔，上一幅将会被清除。"],
         prompt: "让笔感应手机左右倾斜的方向吗？",
         enable: "开启", later: "稍后", label: "使用方法"
       },
       ar: {
-        steps: ["المس جسم القلم لرفعه واستخدامه.", "اضغط باستمرار وأكمل رسماً بخط واحد. انتبه: عند رفع القلم مرة أخرى سيُمسح الرسم السابق.", "جرّب إمالة الهاتف يميناً ويساراً."],
+        steps: ["المس جسم القلم وجرّب أن ترفعه.", "اضغط باستمرار لتبدأ الإبداع، وارسم خطاً يخصك وحدك. ارفع إصبعك ليكتمل.", "عندما ترفع القلم مرة أخرى، سيُمسح عملك السابق."],
         prompt: "هل تريد أن يستجيب القلم لإمالة هاتفك؟",
         enable: "تشغيل", later: "لاحقاً", label: "طريقة الاستخدام"
       }
