@@ -1697,7 +1697,10 @@ body.mobile-about-scroll-active {
         background: #fff;
         font: 400 18px/1.25 "Helvetica Neue", Arial, sans-serif;
       }
-      .motion-prompt-text { margin: 0 0 18px; }
+      .motion-prompt-text {
+        margin: 0 0 18px;
+        white-space: pre-line;
+      }
       .motion-prompt-actions { display: flex; gap: 10px; }
       .motion-prompt button {
         flex: 1;
@@ -2002,26 +2005,26 @@ BوB Tokyo Jingumae Shop
       en: {
         title: "USE ME",
         steps: ["Tap the pen body and try picking it up.", "Press and hold to begin creating. Draw a stroke that is uniquely yours. Release to finish.", "Pick up the pen again, and your previous drawing will be cleared."],
-        prompt: "Letting the pen respond to tilting may cause discomfort. Would you like to enable it?",
-        enable: "ENABLE", later: "LATER", label: "How to use"
+        prompt: "Tilt your phone left or right, and the pen will move with gravity.\n\nThe screen movement may cause discomfort. Would you like to try it?",
+        enable: "TRY IT", later: "NO, THANKS", label: "How to use"
       },
       jp: {
         title: "描いてみる",
         steps: ["ペン本体をタップして、持ち上げてみてください。", "長押しして創作を始め、あなただけの一筆を描いてください。指を離すと完成です。", "もう一度ペンを持ち上げると、前の作品は消去されます。"],
-        prompt: "左右の傾きにペンを反応させると、不快感を覚える場合があります。有効にしますか？",
-        enable: "オンにする", later: "あとで", label: "使い方"
+        prompt: "スマートフォンを左右に傾けると、ペンも重力に合わせて動きます。\n\n画面の動きで気分が悪くなる場合があります。この機能を試しますか？",
+        enable: "試してみる", later: "使用しない", label: "使い方"
       },
       cn: {
         title: "用我创作",
         steps: ["点击笔身，试试拿起这支笔。", "按住开始创作，画下专属于你的一笔。松手即完成。", "再次拿起笔，上一幅将会被清除。"],
-        prompt: "让笔感应左右倾斜可能会引起你的不适，是否开启？",
-        enable: "开启", later: "稍后", label: "使用方法"
+        prompt: "左右倾斜手机时，笔会随重力转动。\n\n画面的运动可能引起不适，要试试这个功能吗？",
+        enable: "试试看", later: "不开启", label: "使用方法"
       },
       ar: {
         title: "ارسم بي",
         steps: ["المس جسم القلم وجرّب أن ترفعه.", "اضغط باستمرار لتبدأ الإبداع، وارسم خطاً يخصك وحدك. ارفع إصبعك ليكتمل.", "عندما ترفع القلم مرة أخرى، سيُمسح عملك السابق."],
-        prompt: "قد يسبب تفاعل القلم مع إمالة الهاتف شعوراً بعدم الارتياح. هل تريد تشغيله؟",
-        enable: "تشغيل", later: "لاحقاً", label: "طريقة الاستخدام"
+        prompt: "عندما تميل هاتفك يميناً أو يساراً، يتحرك القلم مع الجاذبية.\n\nقد تسبب حركة الشاشة شعوراً بعدم الارتياح. هل تريد تجربة هذه الميزة؟",
+        enable: "جرّبها", later: "عدم التشغيل", label: "طريقة الاستخدام"
       }
     };
 
