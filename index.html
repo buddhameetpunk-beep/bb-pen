@@ -2043,6 +2043,7 @@ BوB Tokyo Jingumae Shop
     let idlePenPointerX = -10000;
     let idlePenPointerY = -10000;
     let gyroPermissionStarted = false;
+    let gyroPermissionPending = false;
     let gyroRotation = 0;
 
     const HAND_MAX_WIDTH = 1600;
@@ -3492,22 +3493,30 @@ khepriButton.addEventListener("click", async (event) => {
     }
 
     async function enablePenGyroscope() {
-      if (gyroPermissionStarted || window.innerWidth > 700 || !("DeviceOrientationEvent" in window)) return;
-      gyroPermissionStarted = true;
+      if (gyroPermissionStarted || gyroPermissionPending || window.innerWidth > 700 || !("DeviceOrientationEvent" in window)) return;
+      gyroPermissionPending = true;
 
       try {
         if (typeof DeviceOrientationEvent.requestPermission === "function") {
           const permission = await DeviceOrientationEvent.requestPermission();
-          if (permission !== "granted") return;
+          if (permission !== "granted") {
+            gyroPermissionPending = false;
+            return;
+          }
         }
         window.addEventListener("deviceorientation", handlePenDeviceOrientation, { passive: true });
+        gyroPermissionStarted = true;
       } catch (error) {
-        /* The pen remains static when motion access is unavailable or declined. */
+        /* A later user gesture may retry if this gesture was not accepted. */
+      } finally {
+        gyroPermissionPending = false;
       }
     }
 
-    /* iOS requires this request to happen inside the user's first gesture. */
-    window.addEventListener("pointerdown", enablePenGyroscope, { once: true, passive: true });
+    /* Capture runs before the pen buttons stop propagation. iOS requires a user gesture. */
+    window.addEventListener("pointerdown", enablePenGyroscope, { capture: true, passive: true });
+    window.addEventListener("touchend", enablePenGyroscope, { capture: true, passive: true });
+    window.addEventListener("click", enablePenGyroscope, { capture: true, passive: true });
 
     /* Browsers without a permission prompt can begin listening immediately. */
     if (!(typeof DeviceOrientationEvent !== "undefined" &&
