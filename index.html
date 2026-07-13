@@ -1137,7 +1137,7 @@ body.mobile-about-scroll-active {
 
       .home:not(.guide-complete) .pen-wrap:not(.is-selected) {
         transform: translate(-50%, -50%) rotate(var(--gyro-rotation, 0deg));
-        transition: transform 0.12s linear, left 0.18s ease, top 0.18s ease, height 0.18s ease;
+        transition: left 0.18s ease, top 0.18s ease, height 0.18s ease;
       }
 
       .about-ui {
@@ -1176,12 +1176,21 @@ body.mobile-about-scroll-active {
 
       .home.about-open #drawCanvas {
         z-index: 10005;
+        opacity: 0;
         pointer-events: none !important;
       }
 
       .home.about-open .pen-wrap {
         z-index: 10006;
+        opacity: 0;
         pointer-events: none !important;
+      }
+
+      .home.about-open.about-tip-reveal .pen-wrap {
+        z-index: 10035;
+        opacity: 1;
+        clip-path: inset(91% 0 0 0);
+        -webkit-clip-path: inset(91% 0 0 0);
       }
 
       .home.about-open .about-panel {
@@ -1274,7 +1283,7 @@ body.mobile-about-scroll-active {
         height: 100dvh;
         max-height: none;
         z-index: 10030;
-        background: transparent;
+        background: #fff;
         transform: translateY(-105%);
         opacity: 0;
       }
@@ -1287,12 +1296,7 @@ body.mobile-about-scroll-active {
       .about-content {
         padding: max(34px, calc(env(safe-area-inset-top) + 28px)) 22px 132px;
         text-align: left;
-        background: linear-gradient(
-          to bottom,
-          rgba(255, 255, 255, 0.86) 0%,
-          rgba(255, 255, 255, 0.70) 42%,
-          rgba(255, 255, 255, 0.00) 100%
-        );
+        background: #fff;
       }
 
       .about-title {
@@ -1602,32 +1606,41 @@ body.mobile-about-scroll-active {
       }
 
       .mobile-help-button {
+        position: relative;
         width: 52px;
         height: 52px;
-        border: 2px solid #000;
-        border-radius: 50%;
-        background: #fff;
-        color: #000;
-        font: 400 31px/1 "Helvetica Neue", Arial, sans-serif;
+        border: 0;
+        background: transparent;
+        padding: 0;
       }
 
-      .mobile-help-panel {
+      .mobile-help-button img {
         position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+      .mobile-help-icon-open { display: none; }
+      .mobile-help.is-open .mobile-help-icon-normal { display: none; }
+      .mobile-help.is-open .mobile-help-icon-open { display: block; }
+
+      .mobile-help-panel {
+        position: fixed;
         left: 0;
-        bottom: 62px;
-        width: min(82vw, 330px);
-        padding: 18px 20px;
-        border: 2px solid #000;
+        top: 0;
+        width: 100vw;
+        padding: max(34px, calc(env(safe-area-inset-top) + 28px)) 22px 30px;
+        border: 0;
         background: #fff;
-        font: 400 17px/1.25 "Helvetica Neue", Arial, sans-serif;
-        opacity: 0;
-        transform: translateY(8px);
+        font: 400 20px/1.22 "Helvetica Neue", Arial, sans-serif;
+        opacity: 1;
+        transform: translateY(-105%);
         pointer-events: none;
-        transition: opacity .18s ease, transform .18s ease;
+        transition: transform .58s cubic-bezier(.22,1,.36,1);
       }
 
       .mobile-help.is-open .mobile-help-panel {
-        opacity: 1;
         transform: translateY(0);
         pointer-events: auto;
       }
@@ -1667,6 +1680,12 @@ body.mobile-about-scroll-active {
       }
       .motion-prompt-enable { background: #42bdff !important; }
       .home.lang-ar .motion-prompt-card { direction: rtl; text-align: right; }
+
+      /* Language selection remains available before motion permission is chosen. */
+      .motion-prompt:not(.is-hidden) ~ .language-switch,
+      .language-switch {
+        z-index: 300010;
+      }
     }
 
   </style>
@@ -1808,7 +1827,10 @@ body.mobile-about-scroll-active {
     </div>
 
     <div class="mobile-help" id="mobileHelp">
-      <button class="mobile-help-button" id="mobileHelpButton" type="button" aria-label="How to use">?</button>
+      <button class="mobile-help-button" id="mobileHelpButton" type="button" aria-label="How to use">
+        <img class="mobile-help-icon-normal" src="question01.png" alt="" />
+        <img class="mobile-help-icon-open" src="question02.png" alt="" />
+      </button>
       <div class="mobile-help-panel" id="mobileHelpPanel"></div>
     </div>
 
@@ -1949,22 +1971,22 @@ BوB Tokyo Jingumae Shop
 
     const mobileGuideTexts = {
       en: {
-        steps: ["1. Tap the pen body to pick it up.", "2. Hold and draw one stroke to enter.", "3. The end of the pen can also be pressed.", "4. Try tilting your phone left and right."],
+        steps: ["Tap the pen body to pick it up and use it.", "Hold and complete one continuous stroke. Please note: picking up the pen again clears the previous drawing.", "Try tilting your phone left and right."],
         prompt: "Let the pen respond to the way you tilt your phone?",
         enable: "ENABLE", later: "LATER", label: "How to use"
       },
       jp: {
-        steps: ["1. ペン本体をタップして持ち上げます。", "2. 長押しして一筆描くと、ページに入れます。", "3. ペンのおしりも押せます。", "4. スマートフォンを左右に傾けてみてください。"],
+        steps: ["ペン本体をタップすると、持ち上げて使えます。", "長押ししたまま、一筆で描き切ってください。もう一度ペンを持ち上げると、前に描いた図形は消えます。", "スマートフォンを左右に傾けてみてください。"],
         prompt: "スマートフォンの傾きにペンを反応させますか？",
         enable: "オンにする", later: "あとで", label: "使い方"
       },
       cn: {
-        steps: ["1. 点击笔身，把笔拿起来。", "2. 按住画完一笔，即可进入页面。", "3. 笔尾也可以按。", "4. 试着左右倾斜手机。"],
+        steps: ["点击笔身可以把笔拿起来使用哦。", "按住并一笔画完，请注意再次拿起笔会清除之前的图形。", "可以试着左右倾斜手机。"],
         prompt: "让笔感应手机左右倾斜的方向吗？",
         enable: "开启", later: "稍后", label: "使用方法"
       },
       ar: {
-        steps: ["١. المس جسم القلم لرفعه.", "٢. اضغط وارسم خطاً واحداً للدخول.", "٣. يمكن أيضاً ضغط نهاية القلم.", "٤. جرّب إمالة الهاتف يميناً ويساراً."],
+        steps: ["المس جسم القلم لرفعه واستخدامه.", "اضغط باستمرار وأكمل رسماً بخط واحد. انتبه: عند رفع القلم مرة أخرى سيُمسح الرسم السابق.", "جرّب إمالة الهاتف يميناً ويساراً."],
         prompt: "هل تريد أن يستجيب القلم لإمالة هاتفك؟",
         enable: "تشغيل", later: "لاحقاً", label: "طريقة الاستخدام"
       }
@@ -2172,6 +2194,9 @@ BوB Tokyo Jingumae Shop
     let gyroPermissionStarted = false;
     let gyroPermissionPending = false;
     let gyroRotation = 0;
+    let gyroTargetRotation = 0;
+    let gyroVelocity = 0;
+    let gyroAnimationFrame = null;
 
     const HAND_MAX_WIDTH = 1600;
     const HAND_MIN_WIDTH = 700;
@@ -2543,11 +2568,18 @@ BوB Tokyo Jingumae Shop
 
     function closeAbout() {
       home.classList.remove("about-open");
+      home.classList.remove("about-tip-reveal");
       aboutButton.classList.remove("is-active");
       aboutPanel.setAttribute("aria-hidden", "true");
       document.documentElement.classList.remove("mobile-about-scroll-active");
       document.body.classList.remove("mobile-about-scroll-active");
     }
+
+    aboutPanel.addEventListener("scroll", () => {
+      if (window.innerWidth > 700 || !home.classList.contains("about-open")) return;
+      const remaining = aboutPanel.scrollHeight - aboutPanel.clientHeight - aboutPanel.scrollTop;
+      home.classList.toggle("about-tip-reveal", remaining < 90);
+    }, { passive: true });
 
     function toggleAbout() {
       if (home.classList.contains("about-open")) {
@@ -3629,8 +3661,7 @@ khepriButton.addEventListener("click", async (event) => {
 
     function handlePenDeviceOrientation(event) {
       if (window.innerWidth > 700 || isSelected || home.classList.contains("guide-complete")) {
-        gyroRotation += (0 - gyroRotation) * 0.18;
-        home.style.setProperty("--gyro-rotation", gyroRotation.toFixed(2) + "deg");
+        gyroTargetRotation = 0;
         return;
       }
 
@@ -3640,9 +3671,26 @@ khepriButton.addEventListener("click", async (event) => {
 
       const orientationSign = portrait || window.orientation === 90 ? 1 : -1;
       const tiltAfterDeadZone = Math.abs(rawTilt) < 3 ? 0 : rawTilt - Math.sign(rawTilt) * 3;
-      const target = clampNumber(-tiltAfterDeadZone * orientationSign, -24, 24);
-      gyroRotation += (target - gyroRotation) * 0.045;
+      gyroTargetRotation = clampNumber(-tiltAfterDeadZone * orientationSign, -24, 24);
+    }
+
+    function animatePenGyroscope() {
+      if (window.innerWidth > 700 || isSelected || home.classList.contains("guide-complete")) {
+        gyroTargetRotation = 0;
+      }
+
+      /* A damped spring runs at display refresh rate, independent of sensor frequency. */
+      gyroVelocity += (gyroTargetRotation - gyroRotation) * 0.032;
+      gyroVelocity *= 0.80;
+      gyroRotation += gyroVelocity;
+
+      if (Math.abs(gyroTargetRotation - gyroRotation) < 0.002 && Math.abs(gyroVelocity) < 0.002) {
+        gyroRotation = gyroTargetRotation;
+        gyroVelocity = 0;
+      }
+
       home.style.setProperty("--gyro-rotation", gyroRotation.toFixed(2) + "deg");
+      gyroAnimationFrame = requestAnimationFrame(animatePenGyroscope);
     }
 
     async function enablePenGyroscope() {
@@ -3678,6 +3726,7 @@ khepriButton.addEventListener("click", async (event) => {
     }, { passive: true });
 
     idlePenShakeFrame = requestAnimationFrame(animateIdlePenShake);
+    gyroAnimationFrame = requestAnimationFrame(animatePenGyroscope);
 
     resizeCanvas();
     updateGuide();
