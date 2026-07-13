@@ -1139,7 +1139,7 @@ body.mobile-about-scroll-active {
         z-index: 200010;
       }
 
-      .home:not(.guide-complete) .pen-wrap:not(.is-selected) {
+      .home .pen-wrap:not(.is-selected) {
         transform: translate(-50%, -50%) rotate(var(--gyro-rotation, 0deg));
         transition: left 0.18s ease, top 0.18s ease, height 0.18s ease;
       }
@@ -1997,25 +1997,25 @@ BوB Tokyo Jingumae Shop
       en: {
         title: "CREATE WITH ME",
         steps: ["Tap the pen body and try picking it up.", "Press and hold to begin creating. Draw a stroke that is uniquely yours. Release to finish.", "Pick up the pen again, and your previous drawing will be cleared."],
-        prompt: "Let the pen respond to the way you tilt your phone?",
+        prompt: "Letting the pen respond to tilting may cause discomfort. Would you like to enable it?",
         enable: "ENABLE", later: "LATER", label: "How to use"
       },
       jp: {
         title: "私を使って創作",
         steps: ["ペン本体をタップして、持ち上げてみてください。", "長押しして創作を始め、あなただけの一筆を描いてください。指を離すと完成です。", "もう一度ペンを持ち上げると、前の作品は消去されます。"],
-        prompt: "スマートフォンの傾きにペンを反応させますか？",
+        prompt: "左右の傾きにペンを反応させると、不快感を覚える場合があります。有効にしますか？",
         enable: "オンにする", later: "あとで", label: "使い方"
       },
       cn: {
         title: "用我创作",
         steps: ["点击笔身，试试拿起这支笔。", "按住开始创作，画下专属于你的一笔。松手即完成。", "再次拿起笔，上一幅将会被清除。"],
-        prompt: "让笔感应手机左右倾斜的方向吗？",
+        prompt: "让笔感应左右倾斜可能会引起你的不适，是否开启？",
         enable: "开启", later: "稍后", label: "使用方法"
       },
       ar: {
         title: "أبدع بي",
         steps: ["المس جسم القلم وجرّب أن ترفعه.", "اضغط باستمرار لتبدأ الإبداع، وارسم خطاً يخصك وحدك. ارفع إصبعك ليكتمل.", "عندما ترفع القلم مرة أخرى، سيُمسح عملك السابق."],
-        prompt: "هل تريد أن يستجيب القلم لإمالة هاتفك؟",
+        prompt: "قد يسبب تفاعل القلم مع إمالة الهاتف شعوراً بعدم الارتياح. هل تريد تشغيله؟",
         enable: "تشغيل", later: "لاحقاً", label: "طريقة الاستخدام"
       }
     };
@@ -3689,7 +3689,7 @@ khepriButton.addEventListener("click", async (event) => {
     }
 
     function handlePenDeviceOrientation(event) {
-      if (window.innerWidth > 700 || isSelected || home.classList.contains("guide-complete")) {
+      if (window.innerWidth > 700 || isSelected) {
         gyroTargetRotation = 0;
         return;
       }
@@ -3704,7 +3704,7 @@ khepriButton.addEventListener("click", async (event) => {
     }
 
     function animatePenGyroscope() {
-      if (window.innerWidth > 700 || isSelected || home.classList.contains("guide-complete")) {
+      if (window.innerWidth > 700 || isSelected) {
         gyroTargetRotation = 0;
       }
 
