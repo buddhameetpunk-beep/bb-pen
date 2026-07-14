@@ -1722,7 +1722,7 @@ body.mobile-about-scroll-active {
 </head>
 
 <body>
-  <main class="home lang-en" id="home">
+  <main class="home lang-ar" id="home">
     <canvas id="drawCanvas"></canvas>
 
     <div class="logo-wrap" id="logoWrap" aria-label="Back to guide">
@@ -1834,7 +1834,7 @@ body.mobile-about-scroll-active {
       </button>
 
       <div class="language-options" id="languageOptions">
-        <button class="language-button is-active" data-lang="en" aria-label="English">
+        <button class="language-button" data-lang="en" aria-label="English">
           <img class="lang-img lang-img-normal" src="en01.png" alt="" />
           <img class="lang-img lang-img-hover" src="en02.png" alt="" />
         </button>
@@ -1849,7 +1849,7 @@ body.mobile-about-scroll-active {
           <img class="lang-img lang-img-hover" src="cn02.png" alt="" />
         </button>
 
-        <button class="language-button" data-lang="ar" aria-label="Arabic">
+        <button class="language-button is-active" data-lang="ar" aria-label="Arabic">
           <img class="lang-img lang-img-normal" src="ar01.png" alt="" />
           <img class="lang-img lang-img-hover" src="ar02.png" alt="" />
         </button>
@@ -1866,7 +1866,7 @@ body.mobile-about-scroll-active {
 
     <div class="motion-prompt" id="motionPrompt" role="dialog" aria-modal="true">
       <div class="motion-prompt-card">
-        <img class="motion-prompt-image" id="motionPromptImage" src="window_en.png" alt="Move the pen by tilting your phone?" />
+        <img class="motion-prompt-image" id="motionPromptImage" src="window_ar.png" alt="هل تريد تحريك القلم عن طريق إمالة هاتفك؟" />
         <button class="motion-prompt-hit motion-prompt-enable" id="motionPromptEnable" type="button" aria-label="Enable motion control"></button>
         <button class="motion-prompt-hit motion-prompt-later" id="motionPromptLater" type="button" aria-label="Not now"></button>
       </div>
@@ -2578,7 +2578,14 @@ BوB Tokyo Jingumae Shop
 
       button.addEventListener("click", (event) => {
         event.stopPropagation();
-        setLanguage(button.dataset.lang);
+        const selectedLanguage = button.dataset.lang;
+        setLanguage(selectedLanguage);
+
+        try {
+          localStorage.setItem("bwab-language", selectedLanguage);
+        } catch (error) {
+          /* The page still works when private browsing blocks storage. */
+        }
       });
     });
 
@@ -3761,9 +3768,22 @@ khepriButton.addEventListener("click", async (event) => {
     idlePenShakeFrame = requestAnimationFrame(animateIdlePenShake);
     gyroAnimationFrame = requestAnimationFrame(animatePenGyroscope);
 
+    function getInitialLanguage() {
+      try {
+        const savedLanguage = localStorage.getItem("bwab-language");
+        if (["en", "jp", "cn", "ar"].includes(savedLanguage)) {
+          return savedLanguage;
+        }
+      } catch (error) {
+        /* Use the Arabic default when storage is unavailable. */
+      }
+
+      return "ar";
+    }
+
     resizeCanvas();
     updateGuide();
-    setLanguage("en");
+    setLanguage(getInitialLanguage());
     setPenColor("bw");
 
         function handleWindowResize() {
