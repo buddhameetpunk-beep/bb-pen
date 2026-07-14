@@ -1,6 +1,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1664,33 +1665,51 @@ body.mobile-about-scroll-active {
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 24px;
+        padding: 0;
         background: rgba(255,255,255,.72);
       }
 
       .motion-prompt.is-hidden { display: none; }
       .motion-prompt-card {
-        width: min(88vw, 360px);
-        padding: 22px;
-        border: 2px solid #000;
-        background: #fff;
-        font: 400 18px/1.25 "Helvetica Neue", Arial, sans-serif;
+        position: relative;
+        width: min(100vw, 520px);
+        aspect-ratio: 4 / 3;
       }
-      .motion-prompt-text {
-        margin: 0 0 18px;
-        white-space: pre-line;
+
+      .motion-prompt-image {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        pointer-events: none;
       }
-      .motion-prompt-actions { display: flex; gap: 10px; }
-      .motion-prompt button {
-        flex: 1;
-        min-height: 44px;
-        border: 2px solid #000;
-        background: #fff;
-        color: #000;
-        font: inherit;
+
+      .motion-prompt-hit {
+        position: absolute;
+        top: 56.5%;
+        height: 22.5%;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        cursor: pointer;
       }
-      .motion-prompt-enable { background: #42bdff !important; }
-      .home.lang-ar .motion-prompt-card { direction: rtl; text-align: right; }
+
+      .motion-prompt-enable {
+        left: 8%;
+        width: 43%;
+      }
+
+      .motion-prompt-later {
+        left: 51%;
+        width: 42%;
+      }
+
+      .motion-prompt-hit:focus-visible {
+        outline: 3px solid #000;
+        outline-offset: -3px;
+      }
 
       /* Language selection remains available before motion permission is chosen. */
       .motion-prompt:not(.is-hidden) ~ .language-switch,
@@ -1847,11 +1866,9 @@ body.mobile-about-scroll-active {
 
     <div class="motion-prompt" id="motionPrompt" role="dialog" aria-modal="true">
       <div class="motion-prompt-card">
-        <p class="motion-prompt-text" id="motionPromptText"></p>
-        <div class="motion-prompt-actions">
-          <button class="motion-prompt-enable" id="motionPromptEnable" type="button"></button>
-          <button id="motionPromptLater" type="button"></button>
-        </div>
+        <img class="motion-prompt-image" id="motionPromptImage" src="window_en.png" alt="Move the pen by tilting your phone?" />
+        <button class="motion-prompt-hit motion-prompt-enable" id="motionPromptEnable" type="button" aria-label="Enable motion control"></button>
+        <button class="motion-prompt-hit motion-prompt-later" id="motionPromptLater" type="button" aria-label="Not now"></button>
       </div>
     </div>
 
@@ -1927,9 +1944,23 @@ body.mobile-about-scroll-active {
     const mobileHelpButton = document.getElementById("mobileHelpButton");
     const mobileHelpPanel = document.getElementById("mobileHelpPanel");
     const motionPrompt = document.getElementById("motionPrompt");
-    const motionPromptText = document.getElementById("motionPromptText");
+    const motionPromptImage = document.getElementById("motionPromptImage");
     const motionPromptEnable = document.getElementById("motionPromptEnable");
     const motionPromptLater = document.getElementById("motionPromptLater");
+
+    const motionPromptImages = {
+      en: "window_en.png",
+      jp: "window_jp.png",
+      cn: "window_cn.png",
+      ar: "window_ar.png"
+    };
+
+    const motionPromptAltTexts = {
+      en: "Move the pen by tilting your phone?",
+      jp: "スマートフォンを傾けてペンを動かしますか？",
+      cn: "是否通过倾斜手机移动笔？",
+      ar: "هل تريد تحريك القلم عن طريق إمالة هاتفك؟"
+    };
 
     const penAssets = {
       bb: {
@@ -2396,9 +2427,10 @@ BوB Tokyo Jingumae Shop
 
       const mobileData = mobileUiTexts[lang];
       mobileHelpButton.setAttribute("aria-label", mobileData.label);
-      motionPromptText.textContent = mobileData.prompt;
-      motionPromptEnable.textContent = mobileData.enable;
-      motionPromptLater.textContent = mobileData.later;
+      motionPromptImage.src = motionPromptImages[lang];
+      motionPromptImage.alt = motionPromptAltTexts[lang];
+      motionPromptEnable.setAttribute("aria-label", mobileData.enable);
+      motionPromptLater.setAttribute("aria-label", mobileData.later);
 
       if (window.innerWidth <= 820) {
         languageSwitch.classList.remove("is-open");
