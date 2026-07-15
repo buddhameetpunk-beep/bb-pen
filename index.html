@@ -2216,6 +2216,7 @@ BوB Tokyo Jingumae Shop
     let gyroTargetRotation = 0;
     let gyroVelocity = 0;
     let gyroAnimationFrame = null;
+    let gyroUsesGravityVector = false;
 
     const HAND_MAX_WIDTH = 1600;
     const HAND_MIN_WIDTH = 700;
@@ -3661,7 +3662,38 @@ khepriButton.addEventListener("click", async (event) => {
       idlePenShakeFrame = requestAnimationFrame(animateIdlePenShake);
     }
 
+    function setPenGravityRotation(rotation) {
+      gyroTargetRotation = rotation;
+      gyroRotation = rotation;
+      gyroVelocity = 0;
+      home.style.setProperty("--gyro-rotation", gyroRotation.toFixed(2) + "deg");
+    }
+
+    function handlePenDeviceMotion(event) {
+      if (window.innerWidth > 700 || isSelected) {
+        gyroTargetRotation = 0;
+        return;
+      }
+
+      const gravity = event.accelerationIncludingGravity;
+      if (!gravity) return;
+
+      const x = gravity.x;
+      const y = gravity.y;
+      if (typeof x !== "number" || !Number.isFinite(x) ||
+          typeof y !== "number" || !Number.isFinite(y)) return;
+
+      const projectedGravity = Math.hypot(x, y);
+      if (projectedGravity < 1.5) return;
+
+      gyroUsesGravityVector = true;
+      const gravityRotation = Math.atan2(-x, -y) * 180 / Math.PI;
+      setPenGravityRotation(gravityRotation);
+    }
+
     function handlePenDeviceOrientation(event) {
+      if (gyroUsesGravityVector) return;
+
       if (window.innerWidth > 700 || isSelected) {
         gyroTargetRotation = 0;
         return;
@@ -3672,10 +3704,7 @@ khepriButton.addEventListener("click", async (event) => {
       if (typeof rawTilt !== "number" || !Number.isFinite(rawTilt)) return;
 
       const orientationSign = portrait || window.orientation === 90 ? 1 : -1;
-      gyroTargetRotation = -rawTilt * orientationSign;
-      gyroRotation = gyroTargetRotation;
-      gyroVelocity = 0;
-      home.style.setProperty("--gyro-rotation", gyroRotation.toFixed(2) + "deg");
+      setPenGravityRotation(-rawTilt * orientationSign);
     }
 
     function animatePenGyroscope() {
@@ -3698,19 +3727,37 @@ khepriButton.addEventListener("click", async (event) => {
     }
 
     async function enablePenGyroscope() {
-      if (gyroPermissionStarted || gyroPermissionPending || window.innerWidth > 700 || !("DeviceOrientationEvent" in window)) return;
+      const supportsOrientation = "DeviceOrientationEvent" in window;
+      const supportsMotion = "DeviceMotionEvent" in window;
+      if (gyroPermissionStarted || gyroPermissionPending || window.innerWidth > 700 ||
+          (!supportsOrientation && !supportsMotion)) return;
       gyroPermissionPending = true;
 
       try {
-        if (typeof DeviceOrientationEvent.requestPermission === "function") {
-          const permission = await DeviceOrientationEvent.requestPermission();
-          if (permission !== "granted") {
-            gyroPermissionPending = false;
-            return;
-          }
+        const orientationPermissionPromise = supportsOrientation &&
+          typeof DeviceOrientationEvent.requestPermission === "function"
+            ? DeviceOrientationEvent.requestPermission()
+            : Promise.resolve(supportsOrientation ? "granted" : "unavailable");
+
+        const motionPermissionPromise = supportsMotion &&
+          typeof DeviceMotionEvent.requestPermission === "function"
+            ? DeviceMotionEvent.requestPermission()
+            : Promise.resolve(supportsMotion ? "granted" : "unavailable");
+
+        const [orientationPermission, motionPermission] = await Promise.all([
+          orientationPermissionPromise,
+          motionPermissionPromise
+        ]);
+
+        if (motionPermission === "granted") {
+          window.addEventListener("devicemotion", handlePenDeviceMotion, { passive: true });
         }
-        window.addEventListener("deviceorientation", handlePenDeviceOrientation, { passive: true });
-        gyroPermissionStarted = true;
+
+        if (orientationPermission === "granted") {
+          window.addEventListener("deviceorientation", handlePenDeviceOrientation, { passive: true });
+        }
+
+        gyroPermissionStarted = motionPermission === "granted" || orientationPermission === "granted";
       } catch (error) {
         /* A later user gesture may retry if this gesture was not accepted. */
       } finally {
@@ -3719,8 +3766,12 @@ khepriButton.addEventListener("click", async (event) => {
     }
 
     /* Browsers without a permission prompt can begin listening immediately. */
-    if (!(typeof DeviceOrientationEvent !== "undefined" &&
-          typeof DeviceOrientationEvent.requestPermission === "function")) {
+    const motionNeedsPermission = typeof DeviceMotionEvent !== "undefined" &&
+      typeof DeviceMotionEvent.requestPermission === "function";
+    const orientationNeedsPermission = typeof DeviceOrientationEvent !== "undefined" &&
+      typeof DeviceOrientationEvent.requestPermission === "function";
+
+    if (!motionNeedsPermission && !orientationNeedsPermission) {
       enablePenGyroscope();
     }
 
