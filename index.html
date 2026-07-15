@@ -3672,8 +3672,10 @@ khepriButton.addEventListener("click", async (event) => {
       if (typeof rawTilt !== "number" || !Number.isFinite(rawTilt)) return;
 
       const orientationSign = portrait || window.orientation === 90 ? 1 : -1;
-      const tiltAfterDeadZone = Math.abs(rawTilt) < 3 ? 0 : rawTilt - Math.sign(rawTilt) * 3;
-      gyroTargetRotation = clampNumber(-tiltAfterDeadZone * orientationSign, -45, 45);
+      gyroTargetRotation = -rawTilt * orientationSign;
+      gyroRotation = gyroTargetRotation;
+      gyroVelocity = 0;
+      home.style.setProperty("--gyro-rotation", gyroRotation.toFixed(2) + "deg");
     }
 
     function animatePenGyroscope() {
@@ -3681,7 +3683,7 @@ khepriButton.addEventListener("click", async (event) => {
         gyroTargetRotation = 0;
       }
 
-      /* A damped spring runs at display refresh rate, independent of sensor frequency. */
+      /* Sensor updates stay exact; the spring only eases the pen back to zero when inactive. */
       gyroVelocity += (gyroTargetRotation - gyroRotation) * 0.032;
       gyroVelocity *= 0.80;
       gyroRotation += gyroVelocity;
