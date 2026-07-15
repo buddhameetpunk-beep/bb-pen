@@ -3673,7 +3673,7 @@ khepriButton.addEventListener("click", async (event) => {
 
       const orientationSign = portrait || window.orientation === 90 ? 1 : -1;
       const tiltAfterDeadZone = Math.abs(rawTilt) < 3 ? 0 : rawTilt - Math.sign(rawTilt) * 3;
-      gyroTargetRotation = clampNumber(-tiltAfterDeadZone * orientationSign, -24, 24);
+      gyroTargetRotation = clampNumber(-tiltAfterDeadZone * orientationSign, -45, 45);
     }
 
     function animatePenGyroscope() {
