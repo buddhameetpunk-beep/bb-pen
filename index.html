@@ -2217,6 +2217,12 @@ BوB Tokyo Jingumae Shop
     let gyroVelocity = 0;
     let gyroAnimationFrame = null;
     let gyroUsesGravityVector = false;
+    let filteredGravityX = 0;
+    let filteredGravityY = 0;
+    let gravityFilterInitialized = false;
+
+    const GRAVITY_FILTER_STRENGTH = 0.16;
+    const GRAVITY_ANGLE_DEAD_BAND = 0.35;
 
     const HAND_MAX_WIDTH = 1600;
     const HAND_MIN_WIDTH = 700;
@@ -3670,7 +3676,7 @@ khepriButton.addEventListener("click", async (event) => {
     }
 
     function handlePenDeviceMotion(event) {
-      if (window.innerWidth > 700 || isSelected) {
+      if (window.innerWidth > 700) {
         gyroTargetRotation = 0;
         return;
       }
@@ -3686,8 +3692,22 @@ khepriButton.addEventListener("click", async (event) => {
       const projectedGravity = Math.hypot(x, y);
       if (projectedGravity < 1.5) return;
 
+      if (!gravityFilterInitialized) {
+        filteredGravityX = x;
+        filteredGravityY = y;
+        gravityFilterInitialized = true;
+      } else {
+        filteredGravityX += (x - filteredGravityX) * GRAVITY_FILTER_STRENGTH;
+        filteredGravityY += (y - filteredGravityY) * GRAVITY_FILTER_STRENGTH;
+      }
+
       gyroUsesGravityVector = true;
-      const gravityRotation = Math.atan2(-x, -y) * 180 / Math.PI;
+      if (isSelected) return;
+
+      const gravityRotation = Math.atan2(-filteredGravityX, -filteredGravityY) * 180 / Math.PI;
+      const shortestDelta = ((gravityRotation - gyroRotation + 540) % 360) - 180;
+      if (Math.abs(shortestDelta) < GRAVITY_ANGLE_DEAD_BAND) return;
+
       setPenGravityRotation(gravityRotation);
     }
 
