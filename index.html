@@ -162,7 +162,7 @@ body.mobile-about-scroll-active {
       top: 18vh;
       z-index: 3;
       pointer-events: none;
-      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-family: "univers-next-pro", Arial, sans-serif;
       font-weight: 400;
       color: #000000;
     }
@@ -238,7 +238,7 @@ body.mobile-about-scroll-active {
     }
 
     .home.lang-cn .guide {
-      font-family: "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+      font-family: "univers-next-pro", "PingFang SC", "Microsoft YaHei", sans-serif;
     }
 
     .home.lang-ar .guide {
@@ -246,7 +246,7 @@ body.mobile-about-scroll-active {
       right: 4.2vw;
       direction: rtl;
       text-align: right;
-      font-family: "Helvetica Neue", Arial, sans-serif;
+      font-family: "univers-next-pro", Arial, sans-serif;
     }
 
     .guide-step {
@@ -473,14 +473,14 @@ body.mobile-about-scroll-active {
 
     .about-content {
       padding: 0 0 34px;
-      font-family: "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+      font-family: "univers-next-pro", "PingFang SC", "Microsoft YaHei", sans-serif;
       text-align: right;
     }
 
     .about-title {
       display: none;
       margin: 0 0 26px 0;
-      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-family: "univers-next-pro", Arial, sans-serif;
       font-size: clamp(42px, 10vw, 86px);
       line-height: 0.9;
       letter-spacing: -0.06em;
@@ -500,7 +500,7 @@ body.mobile-about-scroll-active {
     .home.lang-ar .about-content {
       direction: rtl;
       text-align: right;
-      font-family: "Helvetica Neue", Arial, sans-serif;
+      font-family: "univers-next-pro", Arial, sans-serif;
     }
 
     .about-content p {
@@ -512,7 +512,7 @@ body.mobile-about-scroll-active {
     }
 
     .made-in-egypt {
-      font-family: "monotype-grotesque", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-family: "monotype-grotesque", "univers-next-pro", Arial, sans-serif;
       font-weight: 700;
       font-style: normal;
       letter-spacing: -0.02em;
@@ -719,7 +719,7 @@ body.mobile-about-scroll-active {
       display: flex;
       align-items: flex-end;
       gap: 10px;
-      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-family: "univers-next-pro", Arial, sans-serif;
       font-weight: 400;
     }
 
@@ -1289,7 +1289,7 @@ body.mobile-about-scroll-active {
         line-height: 0.9;
         letter-spacing: -0.065em;
         font-weight: 400;
-        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-family: "univers-next-pro", Arial, sans-serif;
       }
 
       .home.lang-jp .about-content,
@@ -1339,7 +1339,7 @@ body.mobile-about-scroll-active {
   line-height: 0.9;
   letter-spacing: -0.065em;
   font-weight: 400;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "univers-next-pro", Arial, sans-serif;
 }
 
       .mobile-shop-grid {
@@ -1622,7 +1622,7 @@ body.mobile-about-scroll-active {
         padding: max(34px, calc(env(safe-area-inset-top) + 28px)) 22px 30px;
         border: 0;
         background: #fff;
-        font: 400 20px/1.22 "Helvetica Neue", Arial, sans-serif;
+        font: 400 20px/1.22 "univers-next-pro", Arial, sans-serif;
         opacity: 1;
         transform: translateY(-105%);
         pointer-events: none;
@@ -2214,15 +2214,15 @@ BوB Tokyo Jingumae Shop
     let gyroPermissionPending = false;
     let gyroRotation = 0;
     let gyroTargetRotation = 0;
-    let gyroVelocity = 0;
     let gyroAnimationFrame = null;
     let gyroUsesGravityVector = false;
     let filteredGravityX = 0;
     let filteredGravityY = 0;
     let gravityFilterInitialized = false;
 
-    const GRAVITY_FILTER_STRENGTH = 0.08;
-    const GRAVITY_ANGLE_DEAD_BAND = 1;
+    const GRAVITY_FILTER_STRENGTH = 0.12;
+    const GRAVITY_ANGLE_DEAD_BAND = 0.15;
+    const GRAVITY_EASING = 0.22;
 
     const HAND_MAX_WIDTH = 1600;
     const HAND_MIN_WIDTH = 700;
@@ -3668,11 +3668,9 @@ khepriButton.addEventListener("click", async (event) => {
       idlePenShakeFrame = requestAnimationFrame(animateIdlePenShake);
     }
 
-    function setPenGravityRotation(rotation) {
-      gyroTargetRotation = rotation;
-      gyroRotation = rotation;
-      gyroVelocity = 0;
-      home.style.setProperty("--gyro-rotation", gyroRotation.toFixed(2) + "deg");
+    function setPenGravityTarget(rotation) {
+      const shortestDelta = ((rotation - gyroRotation + 540) % 360) - 180;
+      gyroTargetRotation = gyroRotation + shortestDelta;
     }
 
     function handlePenDeviceMotion(event) {
@@ -3705,10 +3703,10 @@ khepriButton.addEventListener("click", async (event) => {
       if (isSelected) return;
 
       const gravityRotation = Math.atan2(-filteredGravityX, -filteredGravityY) * 180 / Math.PI;
-      const shortestDelta = ((gravityRotation - gyroRotation + 540) % 360) - 180;
+      const shortestDelta = ((gravityRotation - gyroTargetRotation + 540) % 360) - 180;
       if (Math.abs(shortestDelta) < GRAVITY_ANGLE_DEAD_BAND) return;
 
-      setPenGravityRotation(gravityRotation);
+      setPenGravityTarget(gravityRotation);
     }
 
     function handlePenDeviceOrientation(event) {
@@ -3724,7 +3722,7 @@ khepriButton.addEventListener("click", async (event) => {
       if (typeof rawTilt !== "number" || !Number.isFinite(rawTilt)) return;
 
       const orientationSign = portrait || window.orientation === 90 ? 1 : -1;
-      setPenGravityRotation(-rawTilt * orientationSign);
+      setPenGravityTarget(-rawTilt * orientationSign);
     }
 
     function animatePenGyroscope() {
@@ -3732,14 +3730,11 @@ khepriButton.addEventListener("click", async (event) => {
         gyroTargetRotation = 0;
       }
 
-      /* Sensor updates stay exact; the spring only eases the pen back to zero when inactive. */
-      gyroVelocity += (gyroTargetRotation - gyroRotation) * 0.032;
-      gyroVelocity *= 0.80;
-      gyroRotation += gyroVelocity;
+      const shortestDelta = ((gyroTargetRotation - gyroRotation + 540) % 360) - 180;
+      gyroRotation += shortestDelta * GRAVITY_EASING;
 
-      if (Math.abs(gyroTargetRotation - gyroRotation) < 0.002 && Math.abs(gyroVelocity) < 0.002) {
+      if (Math.abs(shortestDelta) < 0.01) {
         gyroRotation = gyroTargetRotation;
-        gyroVelocity = 0;
       }
 
       home.style.setProperty("--gyro-rotation", gyroRotation.toFixed(2) + "deg");
