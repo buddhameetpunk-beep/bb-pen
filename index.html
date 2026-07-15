@@ -8,6 +8,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BوB</title>
+  <link rel="stylesheet" href="https://use.typekit.net/xto1qme.css">
 
   <style>
     * {
@@ -564,6 +565,14 @@ body.mobile-about-scroll-active {
       letter-spacing: -0.035em;
     }
 
+    .made-in-egypt {
+      font-family: "monotype-grotesque", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-weight: 700;
+      font-style: normal;
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+    }
+
     .home.lang-jp .about-content p,
     .home.lang-cn .about-content p {
       letter-spacing: -0.025em;
@@ -573,6 +582,31 @@ body.mobile-about-scroll-active {
     .home.lang-ar .about-content p {
       letter-spacing: 0;
       line-height: 1.55;
+    }
+
+    @media (min-width: 701px) {
+      .about-panel {
+        width: min(40vw, 550px);
+        padding-right: 10px;
+        scrollbar-gutter: stable;
+      }
+
+      .about-content {
+        width: min(100%, 510px);
+        margin-left: auto;
+        padding-right: 12px;
+      }
+
+      .home.lang-en .about-content,
+      .home.lang-jp .about-content,
+      .home.lang-cn .about-content {
+        text-align: left;
+      }
+
+      .home.lang-ar .about-content {
+        direction: rtl;
+        text-align: right;
+      }
     }
 
     .mobile-shop {
@@ -1718,6 +1752,16 @@ body.mobile-about-scroll-active {
       }
     }
 
+    /* Phone landscape: keep the resting pen at the visual center. */
+    @media (orientation: landscape) and (max-width: 950px) and (max-height: 620px) {
+      .home .pen-wrap:not(.is-selected),
+      .home.guide-complete .pen-wrap:not(.is-selected) {
+        left: 50vw;
+        top: 50dvh;
+        height: 96vw;
+      }
+    }
+
   </style>
 </head>
 
@@ -1820,7 +1864,7 @@ body.mobile-about-scroll-active {
       </button>
     </div>
 
-    <div class="about-panel" id="aboutPanel" aria-hidden="true">
+    <div class="about-panel" id="aboutPanel" aria-hidden="true" inert>
       <button class="about-close" id="aboutClose" type="button">×</button>
       <div class="about-content" id="aboutBody">
         <h2 class="about-title">ABOUT US</h2>
@@ -2041,14 +2085,17 @@ BوB Tokyo Jingumae Shop
           "1-14-23 Jingumae, Shibuya-ku, Tokyo 150-0001, Japan"
         ],
         paragraphs: [
-          "BوB is pronounced BwaB.",
-          "The middle letter, و, is the Arabic wa, meaning “and.”<br>So the name can be read as BwaB, or written out as B wa B.",
-          "This project began with a ballpoint pen casually bought by a friend at a small street shop during a trip to Egypt.",
-          "It was just a Made in Egypt pen.<br>But the moment I tried writing with it, I was shocked by a smoothness I had never experienced before. That physical memory stayed with me.",
-          "BوB is an experimental brand built from that sensation.",
-          "I wanted to turn the feeling of “this pen is surprisingly smooth” into something visible and playable on a website.",
-          "So the site keeps a few direct actions: press the end, pick up the pen, draw a line, change the color.<br>The moving lines and the crawling scarab both grow out of that first small moment of writing.",
-          "Even without physically using the pen, I hope the viewer can feel a trace of that magic — and begin to want to try the pen themselves."
+          "BوB, pronounced BwaB, is an Egyptian brand devoted to ballpoint pens and the experience of writing.",
+          "The و in the middle is the Arabic word wa, meaning “and.” BوB can therefore also be understood as B and B.",
+          "The two Bs first refer to the two most familiar ballpoint ink colors: Black and Blue. The name, however, is open to other readings. BوB can be a face, or a pair of twins. Joined by “and,” the identical letters sit side by side, mirror one another, and invite new associations.",
+          "We pay attention to ballpoint pens and to writing as a simple, everyday physical act. The contact between tip and paper, the movement of the hand, the trace of ink, and the speed and resistance felt while writing all form part of BوB. We chose this abbreviation because it leaves room for multiple interpretations.",
+          "The above describes the premise of this fictional brand. What follows is the experience that led me, as its designer, to create BوB.",
+          "The project began with a ballpoint pen that a friend happened to buy from a small street shop while traveling in Egypt.",
+          "It was an ordinary pen marked <span class=\"made-in-egypt\">Made in Egypt</span>. The moment I tried it, I was startled by a smoothness unlike anything I had felt before. The direct sensation of the tip moving across paper stayed with me as a physical memory.",
+          "BوB grew out of that memory.",
+          "I wanted to translate the hard-to-describe feeling of “this pen is incredibly smooth” into a brand experience that could be seen, touched, and engaged with—to give a tangible form to the brief, subtle sensations of writing.",
+          "The website became the starting point for the identity system. Visitors can pick up the pen and draw a line, and every line continues moving in a different way. The brand’s graphic forms, compositions, and motion language gradually grew from these randomly generated lines, then extended into packaging, printed matter, and other media.",
+          "Even before someone has used the pen itself, I hope this evolving visual system lets them sense a certain magic in writing—and makes them want to try it by hand."
         ]
       },
 
@@ -2062,14 +2109,17 @@ BوB Tokyo Jingumae Shop
           "東京都渋谷区神宮前 1-14-23"
         ],
         paragraphs: [
-          "BوB は、ビー・ワ・ビーと読みます。",
-          "真ん中の و はアラビア語の wa で、「と／and」を意味します。<br>そのため、この名前は BwaB、ビー・ワ・ビーと読みます。",
-          "このプロジェクトの始まりは、友人がエジプト旅行中に街角の小さな店で何気なく買った一本のボールペンでした。",
-          "それはただの Made in Egypt のペンでした。<br>けれど試し書きをした瞬間、今まで経験したことのないなめらかさに驚きました。その身体的な記憶が、ずっと残りました。",
-          "BوB は、その感覚から立ち上げた実験的なブランドです。",
-          "「このペン、すごくなめらかだ」という感覚を、ウェブ上で見たり触ったりできるものにしたいと思いました。",
-          "だからサイトには、ペンのおしりを押す、持つ、線を引く、色を変える、という直接的な動作を残しています。<br>動き続ける線や小さなスカラベは、その最初の試し書きの手触りから出てきたものです。",
-          "実際にそのペンを使わなくても、見た人がその魔力の一部を感じ、思わず試してみたくなる。そんな仮想の実験ブランドです。"
+          "BوB（ビーワビー）は、エジプト発の、ボールペンと書く体験に向き合うブランドです。",
+          "中央の و は、アラビア語で「〜と／and」を意味する wa。BوB は、B and B と捉えることもできます。",
+          "二つの B は、まずボールペンでもっとも身近な二色、Black と Blue を指しています。ただし、この名前に決まった答えはありません。BوB は顔にも見え、双子のようにも見えます。同じ二つの文字が「と」で結ばれることで、並び合い、呼応しながら、さまざまな連想を生み出します。",
+          "私たちが見つめているのは、ボールペンと、書くという日常的で素朴な身体の動きです。ペン先と紙が触れる感覚、手の動き、インクの軌跡、書くときの速さや抵抗。それらすべてが BوB を形づくる要素です。複数の読み取りを受け止められるこの略称を、ブランド名に選びました。",
+          "ここまでは、架空のブランドとしての BوB の設定です。ここからは、デザイナーである私が BوB をつくるに至ったきっかけについてお話しします。",
+          "このプロジェクトは、友人がエジプトを旅した際、街角の小さな店で何気なく買った一本のボールペンから始まりました。",
+          "それは <span class=\"made-in-egypt\">Made in Egypt</span> と記された、ごく普通のボールペンでした。試し書きをした瞬間、これまでにないほどのなめらかさに驚きました。ペン先が紙の上を走る感覚はとても直接的で、その後も身体の記憶として残り続けました。",
+          "BوB は、その記憶から生まれました。",
+          "「このペンは驚くほどなめらかだ」という言葉にしにくい感覚を、見て、触れて、参加できるブランド体験へ変えたいと考えました。書くときに生まれる一瞬の小さな感覚に、具体的なかたちを与える試みです。",
+          "ウェブサイトは、このブランド・アイデンティティの出発点です。見る人がペンを手に取り一本の線を描くと、その線は毎回異なる動きを続けます。そこから生まれたランダムな線をもとに、グラフィック、構図、モーションの言語が展開し、パッケージや印刷物など、さまざまなメディアへ広がっていきます。",
+          "まだ実際にこのペンを使ったことがなくても、変化し続けるこのビジュアルシステムを通して、書くことに宿る不思議な力を感じ、思わず自分の手で試してみたくなることを願っています。"
         ]
       },
 
@@ -2083,14 +2133,17 @@ BوB Tokyo Jingumae Shop
           "日本东京都涩谷区神宫前 1-14-23"
         ],
         paragraphs: [
-          "BوB 读作 BwaB。",
-          "中间的 و 来自阿拉伯语，读作 wa，意思是“与 / 和”。<br>所以这个名字可以读作 BwaB，也可以写成 B wa B。",
-          "这个项目的起点，是一位朋友去埃及旅行时，在街边小店随手买下的一根圆珠笔。",
-          "它只是一根 Made in Egypt 的笔。<br>但我试写的瞬间，被一种从来没有体验过的顺滑度震惊了。那不是一个关于造型或包装的记忆，而是一种很直接的身体记忆，并且一直让我念念不忘。",
-          "BوB 是从这份身体记忆里生长出来的实验品牌。",
-          "我想做的，是把“这支笔太顺滑了”这件事，变成一种看得见、摸得到的网页体验。",
-          "所以网页里保留了一些很直接的动作：按下笔尾、拿起笔、画一条线、换一种颜色。<br>线条会继续动，甲虫会爬过来，都是从那一下试写的手感里长出来的。",
-          "我希望即便没有真正使用这根笔，观看者也能感受到某种来自书写的魔力，并因此很想亲手试试这支笔。"
+          "BوB 读作 BwaB，是一家来自埃及、专注于圆珠笔与书写体验的品牌。",
+          "名称中间的 و 来自阿拉伯语，读作 wa，意为“与”或“和”。因此，BوB 也可以理解为 B and B。",
+          "两个 B 最初指向圆珠笔最常见的两种墨水颜色：Black 与 Blue。同时，这个名称没有唯一的解释。BوB 可以是一张鬼脸，也可以是一对双胞胎。两个相同的字母被“与”连接起来，形成了一种并置、对应，又可以不断发散的关系。",
+          "我们关注圆珠笔，也关注书写这一日常而简单的身体行为。笔尖与纸面的接触、手的移动、墨水留下的轨迹，以及书写时产生的速度与阻力，都是构成 BوB 的关键词。因此，我们选择了这个可以容纳多种理解的缩写作为品牌名称。",
+          "以上是关于这个假想品牌的设定。下面是我作为设计师，创造 BوB 的起点。",
+          "这个项目源于一位朋友去埃及旅行时，在街边小店随手买下的一根圆珠笔。",
+          "它只是一根标有 <span class=\"made-in-egypt\">Made in Egypt</span> 的普通圆珠笔。但在试写的瞬间，我被一种从未体验过的顺滑度震惊了。笔尖划过纸面的触感非常直接，后来也一直停留在我的身体记忆中。",
+          "BوB 从这份记忆里生长出来。",
+          "我想把“这支笔太顺滑了”这一难以转述的感受，转化成一种可以被看见、触摸和参与的品牌体验，让书写时短暂而微小的感受获得具体的形态。",
+          "网页成为这套品牌识别系统的起点。观看者可以拿起笔画出一条线，而每一次生成的线条都会以不同的方式继续运动。品牌中的图形、构图与动态语言，随后从这些随机生长的线条中逐渐展开，并延伸到包装、印刷品与其他媒介之中。",
+          "我希望即使还没有真正使用过这根笔，观看者也能通过这套不断变化的视觉系统，感受到某种来自书写的魔力，并产生亲手试写的欲望。"
         ]
       },
 
@@ -2104,14 +2157,17 @@ BوB Tokyo Jingumae Shop
           "١-١٤-٢٣ جينغومائه، شيبويا، طوكيو، اليابان"
         ],
         paragraphs: [
-          "نكتب الاسم BوB، ونقرأه «بي وا بي».",
-          "في العربية، يظهر الحرف و داخل الاسم كما هو.<br>لذلك يبدو الاسم مألوفًا قليلًا، وغريبًا قليلًا في الوقت نفسه.",
-          "بدأ هذا المشروع من قلم حبر جاف اشتراه صديق بشكل عابر من متجر صغير في الشارع أثناء رحلة إلى مصر.",
-          "كان مجرد قلم مصنوع في مصر.<br>لكن في اللحظة التي جرّبت الكتابة به، أدهشتني نعومة لم أختبرها من قبل. لم تكن ذكرى عن الشكل أو التغليف، بل ذكرى جسدية مباشرة بقيت معي.",
-          "هذه علامة تجريبية نشأت من تلك الذاكرة الجسدية.",
-          "أردت أن أجعل إحساس «هذا القلم ناعم بشكل غريب» شيئًا يمكن رؤيته وتجربته على الموقع.",
-          "لذلك بقيت في الموقع أفعال مباشرة: الضغط على نهاية القلم، حمله، رسم خط، وتغيير اللون.<br>أما الخطوط المتحركة والجعران الصغير، فقد خرجا من ملمس تلك التجربة الأولى في الكتابة.",
-          "حتى من دون استخدام القلم فعليًا، آمل أن يشعر المشاهد بجزء من تلك القوة، وأن يرغب في تجربة هذا القلم بنفسه."
+          "BوB علامة مصرية متخصصة في أقلام الحبر الجاف وتجربة الكتابة.",
+          "يربط حرف الواو بين حرفي B، ولذلك يمكن فهم الاسم أيضًا بمعنى B and B.",
+          "يشير حرفا B في البداية إلى اللونين الأكثر شيوعًا في أحبار الأقلام: الأسود والأزرق. ومع ذلك، لا يقتصر الاسم على تفسير واحد؛ فقد يبدو BوB كوجه، أو كتوأمين. وحين تجمع الواو بين حرفين متماثلين، تنشأ علاقة من التجاور والتناظر تفتح المجال لتأويلات متجددة.",
+          "نهتم بالقلم، وبالكتابة بوصفها فعلًا جسديًا يوميًا وبسيطًا. ملامسة السن للورق، وحركة اليد، وأثر الحبر، والسرعة والمقاومة أثناء الكتابة؛ كلها مفردات تكوّن عالم BوB. لهذا اخترنا اسمًا مختصرًا يتسع لأكثر من معنى.",
+          "ما سبق هو التصور الذي تقوم عليه هذه العلامة المتخيلة. أما ما يلي، فهو بداية الحكاية التي دفعتني، بصفتي المصمم، إلى ابتكار BوB.",
+          "بدأ المشروع بقلم حبر جاف اشتراه صديق بالمصادفة من متجر صغير في أحد شوارع مصر خلال رحلة هناك.",
+          "كان قلمًا عاديًا يحمل عبارة <span class=\"made-in-egypt\" dir=\"ltr\">Made in Egypt</span>. عندما جرّبت الكتابة به، فاجأتني سلاسة لم أعرفها من قبل. كان مرور السن فوق الورق إحساسًا مباشرًا ظل حاضرًا في ذاكرتي الجسدية.",
+          "من هذه الذاكرة نشأت BوB.",
+          "أردت أن أحوّل الإحساس الذي يصعب وصفه—«هذا القلم سلس إلى حد مدهش»—إلى تجربة بصرية وملموسة يمكن المشاركة فيها، وأن أمنح الأحاسيس الصغيرة والعابرة المصاحبة للكتابة شكلًا محسوسًا.",
+          "كان الموقع الإلكتروني نقطة انطلاق نظام الهوية البصرية. يستطيع الزائر أن يمسك القلم ويرسم خطًا، ثم يواصل كل خط حركته بطريقة مختلفة. ومن هذه الخطوط المتولدة عشوائيًا تطورت الأشكال والتكوينات ولغة الحركة، ثم امتدت إلى التغليف والمطبوعات ووسائط أخرى.",
+          "آمل أن يتيح هذا النظام البصري المتغير للمشاهد أن يلمس شيئًا من سحر الكتابة، حتى قبل أن يستخدم القلم فعليًا، وأن يشعر برغبة في تجربته بيده."
         ]
       }
     };
@@ -2603,6 +2659,7 @@ BوB Tokyo Jingumae Shop
 
       home.classList.add("about-open");
       aboutButton.classList.add("is-active");
+      aboutPanel.inert = false;
       aboutPanel.setAttribute("aria-hidden", "false");
 
       /* If Khepri is still sitting in the article area when About opens,
@@ -2614,8 +2671,17 @@ BوB Tokyo Jingumae Shop
     }
 
     function closeAbout() {
+      if (aboutPanel.contains(document.activeElement)) {
+        const returnFocusTarget = window.innerWidth <= 700
+          ? mobileHelpButton
+          : aboutButton;
+
+        returnFocusTarget.focus({ preventScroll: true });
+      }
+
       home.classList.remove("about-open");
       aboutButton.classList.remove("is-active");
+      aboutPanel.inert = true;
       aboutPanel.setAttribute("aria-hidden", "true");
       document.documentElement.classList.remove("mobile-about-scroll-active");
       document.body.classList.remove("mobile-about-scroll-active");
