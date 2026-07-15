@@ -169,8 +169,7 @@ body.mobile-about-scroll-active {
 
     /* Entry is intentionally language-free: the first drawn stroke unlocks it. */
     .guide,
-    .guide-en-steps,
-    .guide-cn-steps {
+    .guide-en-steps {
       display: none !important;
     }
 
@@ -232,59 +231,6 @@ body.mobile-about-scroll-active {
 
     .guide-en-steps.is-phone .guide-en-step-img {
       object-position: center top;
-    }
-
-    /* CN desktop handwriting guide: CN1.png / CN2.png / CN3.png.
-       Phone still uses the regular live text guide unless phone images are added later. */
-    .guide-cn-steps {
-      position: fixed;
-      inset: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: 3;
-      pointer-events: none;
-      user-select: none;
-      -webkit-user-select: none;
-      display: none;
-      --cn-guide-base-y: 3.4vh;
-    }
-
-    .guide-cn-step-img {
-      position: absolute;
-      inset: 0;
-      width: 100vw;
-      height: 100vh;
-      object-fit: contain;
-      object-position: center center;
-      pointer-events: none;
-      opacity: 1;
-      transform: translateY(calc(var(--cn-guide-base-y, 0vh) + var(--cn-step-shift-y, 0vh)));
-      transition:
-        opacity 0.22s ease,
-        filter 0.22s ease,
-        transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
-      will-change: opacity, transform;
-    }
-
-    .guide-cn-step-img.is-current {
-      opacity: 1;
-      filter: none;
-    }
-
-    .guide-cn-step-img.is-disabled {
-      opacity: 0.18;
-      filter: none;
-    }
-
-    .guide-cn-step-img.is-completed {
-      opacity: 0;
-      filter: none;
-    }
-
-    @media (min-width: 701px) {
-      .home.lang-cn:not(.guide-complete) .guide-cn-steps {
-        display: none;
-      }
     }
 
     .home.lang-jp .guide {
@@ -1754,11 +1700,22 @@ body.mobile-about-scroll-active {
 
     /* Phone landscape: keep the resting pen at the visual center. */
     @media (orientation: landscape) and (max-width: 950px) and (max-height: 620px) {
+      .about-ui {
+        z-index: 200050;
+      }
+
       .home .pen-wrap:not(.is-selected),
       .home.guide-complete .pen-wrap:not(.is-selected) {
         left: 50vw;
         top: 50dvh;
         height: 96vw;
+      }
+    }
+
+    /* iPad portrait: separate the hand from the pen's interactive area. */
+    @media (orientation: portrait) and (min-width: 701px) and (max-width: 1100px) and (min-height: 900px) {
+      .hand-wrap {
+        left: -10vw;
       }
     }
 
@@ -1807,33 +1764,6 @@ body.mobile-about-scroll-active {
         id="guideEnStep3"
         data-guide-step="3"
         src="EN3.png"
-        alt=""
-        draggable="false"
-      />
-    </div>
-
-    <div class="guide-cn-steps" id="guideCnSteps" aria-hidden="true">
-      <img
-        class="guide-cn-step-img"
-        id="guideCnStep1"
-        data-guide-step="1"
-        src="CN1.png"
-        alt=""
-        draggable="false"
-      />
-      <img
-        class="guide-cn-step-img"
-        id="guideCnStep2"
-        data-guide-step="2"
-        src="CN2.png"
-        alt=""
-        draggable="false"
-      />
-      <img
-        class="guide-cn-step-img"
-        id="guideCnStep3"
-        data-guide-step="3"
-        src="CN3.png"
         alt=""
         draggable="false"
       />
@@ -1954,11 +1884,6 @@ body.mobile-about-scroll-active {
     const guideEnStepImages = [guideEnStep1, guideEnStep2, guideEnStep3];
     const guideEnDesktopSources = ["EN1.png", "EN2.png", "EN3.png"];
     const guideEnPhoneSources = ["EN1_phone.png", "EN2_phone.png", "EN3_phone.png"];
-
-    const guideCnStep1 = document.getElementById("guideCnStep1");
-    const guideCnStep2 = document.getElementById("guideCnStep2");
-    const guideCnStep3 = document.getElementById("guideCnStep3");
-    const guideCnStepImages = [guideCnStep1, guideCnStep2, guideCnStep3];
 
     /*
       EN1/2/3.png are desktop layers; EN1/2/3_phone.png are phone layers.
@@ -2306,9 +2231,6 @@ BوB Tokyo Jingumae Shop
       "EN1_phone.png",
       "EN2_phone.png",
       "EN3_phone.png",
-      "CN1.png",
-      "CN2.png",
-      "CN3.png",
       "pen_bb_1.png",
       "pen_bb_2.png",
       "pen_bw_1.png",
@@ -3551,31 +3473,6 @@ khepriButton.addEventListener("click", async (event) => {
       });
     }
 
-    function updateGuideChineseSteps() {
-      const states = [
-        step1Done ? "completed" : "current",
-        !step1Done ? "disabled" : (step2Done ? "completed" : "current"),
-        !step2Done ? "disabled" : (step3Done ? "completed" : "current")
-      ];
-
-      const rise = isFlatLayout() ? EN_STEP_RISE_FLAT_VH : EN_STEP_RISE_DESKTOP_VH;
-
-      const shiftY = [
-        0,
-        step1Done ? -rise : 0,
-        step2Done ? -rise * 2 : (step1Done ? -rise : 0)
-      ];
-
-      guideCnStepImages.forEach((img, index) => {
-        const state = states[index];
-
-        img.classList.toggle("is-current", state === "current");
-        img.classList.toggle("is-disabled", state === "disabled");
-        img.classList.toggle("is-completed", state === "completed");
-        img.style.setProperty("--cn-step-shift-y", shiftY[index] + "vh");
-      });
-    }
-
     function updateGuide() {
       guideStep1.classList.toggle("is-completed", step1Done);
       guideStep2.classList.toggle("is-completed", step2Done);
@@ -3586,7 +3483,6 @@ khepriButton.addEventListener("click", async (event) => {
 
       updateGuideEnglishAssets();
       updateGuideEnglishSteps();
-      updateGuideChineseSteps();
 
       const guideComplete = step1Done && step2Done && step3Done;
       const wasGuideComplete = home.classList.contains("guide-complete");
