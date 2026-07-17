@@ -524,8 +524,8 @@ body.mobile-about-scroll-active {
 
     .home.lang-en .about-content p {
       text-align: justify;
-      text-justify: inter-character;
-      word-spacing: -0.09em;
+      text-justify: inter-word;
+      word-spacing: -0.035em;
       letter-spacing: -0.025em;
       text-align-last: left;
       text-wrap: pretty;
@@ -616,6 +616,16 @@ body.mobile-about-scroll-active {
       vertical-align: -0.77em;
     }
 
+    .fixed-word-space {
+      display: inline-block;
+      width: 0.27em;
+      white-space: nowrap;
+    }
+
+    .image-fill-space {
+      white-space: normal;
+    }
+
     .home.lang-jp .about-content p,
     .home.lang-cn .about-content p {
       letter-spacing: -0.025em;
@@ -640,7 +650,7 @@ body.mobile-about-scroll-active {
     /* Keep every body line on one shared vertical grid. The value is tall
        enough to contain huan1, so image-free lines no longer collapse. */
     .home .about-content .about-paragraphs p {
-      line-height: 2.95;
+      line-height: 1.52;
     }
 
     @media (min-width: 701px) {
@@ -1434,10 +1444,10 @@ body.mobile-about-scroll-active {
 
       .home.lang-en .about-content p {
         text-align: justify;
-        text-justify: inter-character;
+        text-justify: inter-word;
         text-align-last: left;
         text-wrap: pretty;
-        word-spacing: -0.09em;
+        word-spacing: -0.035em;
         letter-spacing: -0.03em;
       }
 
@@ -1451,7 +1461,7 @@ body.mobile-about-scroll-active {
       }
 
       .home .about-content .about-paragraphs p {
-        line-height: 2.95;
+        line-height: 1.52;
       }
 
       .mobile-shop {
@@ -2587,7 +2597,7 @@ BوB Tokyo Jingumae Shop
                so the image remains centered in the resulting gap. */
             if (!isTerminalMark && (beforeMark || fragment.childNodes.length > 0)) {
               if (lang === "en") {
-                fragment.append(document.createElement("wbr"));
+                fragment.append(document.createTextNode(" "));
               } else {
                 fragment.append(document.createTextNode(" "));
               }
@@ -2605,7 +2615,7 @@ BوB Tokyo Jingumae Shop
             fragment.append(image);
             if (!isTerminalMark) {
               if (lang === "en") {
-                fragment.append(document.createElement("wbr"));
+                fragment.append(document.createTextNode(" "));
               } else {
                 fragment.append(document.createTextNode(" "));
               }
@@ -2635,6 +2645,43 @@ BوB Tokyo Jingumae Shop
         if (Array.from(originalMark).some((mark) => pairedDelimiters.has(mark))) {
           image.replaceWith(document.createTextNode(originalMark));
         }
+      });
+    }
+
+    function lockEnglishWordSpaces() {
+      const paragraph = aboutBody.querySelector(".about-paragraphs p");
+      if (!paragraph) return;
+
+      const walker = document.createTreeWalker(paragraph, NodeFilter.SHOW_TEXT);
+      const nodes = [];
+      let node;
+
+      while ((node = walker.nextNode())) {
+        if (node.parentElement && node.parentElement.closest(
+          ".made-in-egypt, .image-fill-space, .fixed-word-space"
+        )) continue;
+        nodes.push(node);
+      }
+
+      nodes.forEach((textNode) => {
+        const value = textNode.nodeValue;
+        if (!/\s/.test(value)) return;
+
+        const fragment = document.createDocumentFragment();
+        let cursor = 0;
+
+        for (const match of value.matchAll(/\s+/g)) {
+          fragment.append(document.createTextNode(value.slice(cursor, match.index)));
+          const fixedSpace = document.createElement("span");
+          fixedSpace.className = "fixed-word-space";
+          fixedSpace.textContent = "\u00a0";
+          fragment.append(fixedSpace);
+          fragment.append(document.createElement("wbr"));
+          cursor = match.index + match[0].length;
+        }
+
+        fragment.append(document.createTextNode(value.slice(cursor)));
+        textNode.replaceWith(fragment);
       });
     }
 
