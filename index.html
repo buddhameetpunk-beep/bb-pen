@@ -2567,6 +2567,21 @@ BوB Tokyo Jingumae Shop
           }
         });
       });
+
+      /* Final safety pass: paired delimiters are structural, never pictorial.
+         This also protects them if the punctuation matcher is expanded later. */
+      const pairedDelimiters = new Set([
+        "(", ")", "（", "）", "[", "]", "［", "］", "{", "}", "｛", "｝",
+        "“", "”", "‘", "’", "\"", "'", "「", "」", "『", "』",
+        "《", "》", "〈", "〉", "【", "】", "〔", "〕", "«", "»"
+      ]);
+
+      aboutBody.querySelectorAll(".about-paragraphs .image-punctuation").forEach((image) => {
+        const originalMark = image.alt || "";
+        if (Array.from(originalMark).some((mark) => pairedDelimiters.has(mark))) {
+          image.replaceWith(document.createTextNode(originalMark));
+        }
+      });
     }
 
     function updateAboutTexts(lang) {
