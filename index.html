@@ -1513,18 +1513,25 @@ body.mobile-about-scroll-active {
       }
 
       .home.lang-ar .mobile-shop-grid {
-        direction: ltr;
+        direction: rtl;
       }
 
       .home.lang-ar .mobile-shop {
-        direction: ltr;
-        text-align: left;
+        direction: rtl;
+        text-align: right !important;
+      }
+
+      .home.lang-ar .mobile-shop-title,
+      .home.lang-ar .mobile-shop-item,
+      .home.lang-ar .mobile-shop-label {
+        direction: rtl;
+        text-align: right !important;
       }
 
       .home.lang-ar .mobile-shop-address {
         direction: rtl;
-        text-align: left;
-        text-align-last: left;
+        text-align: right !important;
+        text-align-last: right !important;
       }
 
       .about-close {
@@ -2893,12 +2900,6 @@ BوB Tokyo Jingumae Shop
         event.stopPropagation();
         const selectedLanguage = button.dataset.lang;
         setLanguage(selectedLanguage);
-
-        try {
-          localStorage.setItem("bwab-language", selectedLanguage);
-        } catch (error) {
-          /* The page still works when private browsing blocks storage. */
-        }
       });
     });
 
@@ -4150,22 +4151,9 @@ khepriButton.addEventListener("click", async (event) => {
     idlePenShakeFrame = requestAnimationFrame(animateIdlePenShake);
     gyroAnimationFrame = requestAnimationFrame(animatePenGyroscope);
 
-    function getInitialLanguage() {
-      try {
-        const savedLanguage = localStorage.getItem("bwab-language");
-        if (["en", "jp", "cn", "ar"].includes(savedLanguage)) {
-          return savedLanguage;
-        }
-      } catch (error) {
-        /* Use the Arabic default when storage is unavailable. */
-      }
-
-      return "ar";
-    }
-
     resizeCanvas();
     updateGuide();
-    setLanguage(getInitialLanguage());
+    setLanguage("en");
     setPenColor("bw");
 
         function handleWindowResize() {
