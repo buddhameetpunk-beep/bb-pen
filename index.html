@@ -504,11 +504,17 @@ body.mobile-about-scroll-active {
     }
 
     .about-content p {
-      margin: 0 0 18px 0;
+      margin: 0 0 8px 0;
       font-size: clamp(17px, 1.45vw, 23px);
-      line-height: 1.42;
+      line-height: 1.34;
       font-weight: 400;
       letter-spacing: -0.035em;
+      text-align: justify;
+      text-align-last: auto;
+      text-justify: inter-word;
+      hyphens: auto;
+      -webkit-hyphens: auto;
+      overflow-wrap: break-word;
     }
 
     .made-in-egypt {
@@ -519,15 +525,55 @@ body.mobile-about-scroll-active {
       white-space: nowrap;
     }
 
+    .inline-word-image {
+      display: inline-block;
+      width: auto;
+      height: 2.94em;
+      margin: 0 0.165em;
+      object-fit: contain;
+      vertical-align: -0.51em;
+      user-select: none;
+      -webkit-user-select: none;
+      pointer-events: none;
+    }
+
+    .inline-word-image.is-wide {
+      height: 2.55em;
+      vertical-align: -0.36em;
+    }
+
+    .inline-word-image.is-extra-wide {
+      height: 2.25em;
+      vertical-align: -0.21em;
+    }
+
+    .inline-word-image.is-tall {
+      height: 6.60em;
+      vertical-align: -1.86em;
+    }
+
+    .inline-word-token {
+      display: inline-block;
+      white-space: nowrap;
+      letter-spacing: 0;
+    }
+
+    .inline-word-token .inline-word-image {
+      margin-left: 0.06em;
+      margin-right: 0.06em;
+    }
+
     .home.lang-jp .about-content p,
     .home.lang-cn .about-content p {
       letter-spacing: -0.025em;
-      line-height: 1.48;
+      line-height: 1.38;
+      text-justify: inter-character;
     }
 
     .home.lang-ar .about-content p {
       letter-spacing: 0;
-      line-height: 1.55;
+      line-height: 1.46;
+      text-justify: inter-word;
     }
 
     @media (min-width: 701px) {
@@ -1314,18 +1360,18 @@ body.mobile-about-scroll-active {
 
       .about-content p {
         font-size: clamp(18px, 5vw, 24px);
-        line-height: 1.46;
+        line-height: 1.36;
         letter-spacing: -0.04em;
-        margin-bottom: 18px;
+        margin-bottom: 9px;
       }
 
       .home.lang-jp .about-content p,
       .home.lang-cn .about-content p {
-        line-height: 1.5;
+        line-height: 1.40;
       }
 
       .home.lang-ar .about-content p {
-        line-height: 1.62;
+        line-height: 1.50;
       }
 
       .mobile-shop {
@@ -2010,17 +2056,17 @@ BوB Tokyo Jingumae Shop
           "1-14-23 Jingumae, Shibuya-ku, Tokyo 150-0001, Japan"
         ],
         paragraphs: [
-          "BوB, pronounced BwaB, is an Egyptian brand devoted to ballpoint pens and the experience of writing.",
+          "BوB, pronounced BwaB, is an Egyptian brand devoted to ballpoint pens and the experience <span class=\"inline-word-token\">O<img class=\"inline-word-image\" src=\"of.png\" alt=\"of\"></span> writing.",
           "The و in the middle is the Arabic word wa, meaning “and.” BوB can therefore also be understood as B and B.",
           "The two Bs first refer to the two most familiar ballpoint ink colors: Black and Blue. The name, however, is open to other readings. BوB can be a face, or a pair of twins. Joined by “and,” the identical letters sit side by side, mirror one another, and invite new associations.",
-          "We pay attention to ballpoint pens and to writing as a simple, everyday physical act. The contact between tip and paper, the movement of the hand, the trace of ink, and the speed and resistance felt while writing all form part of BوB. We chose this abbreviation because it leaves room for multiple interpretations.",
-          "The above describes the premise of this fictional brand. What follows is the experience that led me, as its designer, to create BوB.",
+          "We pay attention to ballpoint pens and to writing as a simple, everyday physical act. The contact between tip and paper, the <span class=\"inline-word-token\">M<img class=\"inline-word-image\" src=\"huan3.png\" alt=\"movement\"></span> of the <span class=\"inline-word-token\">H<img class=\"inline-word-image is-wide\" src=\"handd.png\" alt=\"hand\"></span>, the trace of ink, and the speed and resistance felt while writing all form part of BوB. We chose this abbreviation because it leaves room for multiple interpretations.",
+          "The above describes the premise of <span class=\"inline-word-token\">T<img class=\"inline-word-image is-wide\" src=\"this.png\" alt=\"this\"></span> fictional brand. What follows is the experience that led me, as its designer, to create BوB.",
           "The project began with a ballpoint pen that a friend happened to buy from a small street shop while traveling in Egypt.",
-          "It was an ordinary pen marked <span class=\"made-in-egypt\">Made in Egypt</span>. The moment I tried it, I was startled by a smoothness unlike anything I had felt before. The direct sensation of the tip moving across paper stayed with me as a physical memory.",
-          "BوB grew out of that memory.",
-          "I wanted to translate the hard-to-describe feeling of “this pen is incredibly smooth” into a brand experience that could be seen, touched, and engaged with—to give a tangible form to the brief, subtle sensations of writing.",
-          "The website became the starting point for the identity system. Visitors can pick up the pen and draw a line, and every line continues moving in a different way. The brand’s graphic forms, compositions, and motion language gradually grew from these randomly generated lines, then extended into packaging, printed matter, and other media.",
-          "Even before someone has used the pen itself, I hope this evolving visual system lets them sense a certain magic in writing—and makes them want to try it by hand."
+          "It was an ordinary pen marked <span class=\"made-in-egypt\">Made in Egypt</span>. The moment <img class=\"inline-word-image\" src=\"I.png\" alt=\"I\"> tried it, I was startled by a smoothness unlike anything I had felt before. The direct sensation of the tip moving across paper stayed with me as a physical memory.",
+          "BوB <span class=\"inline-word-token\">G<img class=\"inline-word-image is-tall\" src=\"huan1.png\" alt=\"grew\"></span> out of that memory.",
+          "<img class=\"inline-word-image\" src=\"I.png\" alt=\"I\"> wanted to translate the hard-to-describe feeling of “<span class=\"inline-word-token\">T<img class=\"inline-word-image is-wide\" src=\"this.png\" alt=\"this\"></span> pen is incredibly smooth” into a brand experience that could be <span class=\"inline-word-token\">S<img class=\"inline-word-image is-wide\" src=\"eye.png\" alt=\"seen\"></span>, touched, and engaged with—<span class=\"inline-word-token\">T<img class=\"inline-word-image\" src=\"dao.png\" alt=\"to\"></span> give a tangible <span class=\"inline-word-token\">F<img class=\"inline-word-image\" src=\"huan2.png\" alt=\"form\"></span> to the brief, subtle sensations of writing.",
+          "The website became the starting point for the identity <span class=\"inline-word-token\">S<img class=\"inline-word-image is-extra-wide\" src=\"huan4.png\" alt=\"system\"></span>. Visitors can pick up the pen and draw a line, and every line continues moving in a different way. The brand’s graphic forms, compositions, and motion language gradually grew from these randomly generated lines, then extended into packaging, printed matter, and other media.",
+          "Even before someone has used the pen itself, <img class=\"inline-word-image\" src=\"I.png\" alt=\"I\"> hope this evolving visual system lets them sense a certain magic in writing—and makes them want to try it by <span class=\"inline-word-token\">H<img class=\"inline-word-image is-wide\" src=\"handd.png\" alt=\"hand\"></span>."
         ]
       },
 
@@ -2037,14 +2083,14 @@ BوB Tokyo Jingumae Shop
           "BوB（ビーワビー）は、エジプト発の、ボールペンと書く体験に向き合うブランドです。",
           "中央の و は、アラビア語で「〜と／and」を意味する wa。BوB は、B and B と捉えることもできます。",
           "二つの B は、まずボールペンでもっとも身近な二色、Black と Blue を指しています。ただし、この名前に決まった答えはありません。BوB は顔にも見え、双子のようにも見えます。同じ二つの文字が「と」で結ばれることで、並び合い、呼応しながら、さまざまな連想を生み出します。",
-          "私たちが見つめているのは、ボールペンと、書くという日常的で素朴な身体の動きです。ペン先と紙が触れる感覚、手の動き、インクの軌跡、書くときの速さや抵抗。それらすべてが BوB を形づくる要素です。複数の読み取りを受け止められるこの略称を、ブランド名に選びました。",
-          "ここまでは、架空のブランドとしての BوB の設定です。ここからは、デザイナーである私が BوB をつくるに至ったきっかけについてお話しします。",
+          "私たちが見つめているのは、ボールペンと、書くという日常的で素朴な身体の動きです。ペン先と紙が触れる感覚、<img class=\"inline-word-image is-wide\" src=\"handd.png\" alt=\"手\">の<img class=\"inline-word-image\" src=\"huan3.png\" alt=\"動き\">、インクの軌跡、書くときの速さや抵抗。それらすべてが BوB を形づくる要素です。複数の読み取りを受け止められるこの略称を、ブランド名に選びました。",
+          "ここまでは、架空のブランドとしての BوB の設定です。ここからは、デザイナーである<img class=\"inline-word-image\" src=\"I.png\" alt=\"私\">が BوB をつくるに至ったきっかけについてお話しします。",
           "このプロジェクトは、友人がエジプトを旅した際、街角の小さな店で何気なく買った一本のボールペンから始まりました。",
           "それは <span class=\"made-in-egypt\">Made in Egypt</span> と記された、ごく普通のボールペンでした。試し書きをした瞬間、これまでにないほどのなめらかさに驚きました。ペン先が紙の上を走る感覚はとても直接的で、その後も身体の記憶として残り続けました。",
-          "BوB は、その記憶から生まれました。",
-          "「このペンは驚くほどなめらかだ」という言葉にしにくい感覚を、見て、触れて、参加できるブランド体験へ変えたいと考えました。書くときに生まれる一瞬の小さな感覚に、具体的なかたちを与える試みです。",
-          "ウェブサイトは、このブランド・アイデンティティの出発点です。見る人がペンを手に取り一本の線を描くと、その線は毎回異なる動きを続けます。そこから生まれたランダムな線をもとに、グラフィック、構図、モーションの言語が展開し、パッケージや印刷物など、さまざまなメディアへ広がっていきます。",
-          "まだ実際にこのペンを使ったことがなくても、変化し続けるこのビジュアルシステムを通して、書くことに宿る不思議な力を感じ、思わず自分の手で試してみたくなることを願っています。"
+          "BوB は、その記憶から<img class=\"inline-word-image is-tall\" src=\"huan1.png\" alt=\"生まれました\">。",
+          "「<img class=\"inline-word-image is-wide\" src=\"this.png\" alt=\"この\">ペンは驚くほどなめらかだ」という言葉にしにくい感覚を、<img class=\"inline-word-image is-wide\" src=\"eye.png\" alt=\"見て\">、触れて、参加できるブランド体験へ変えたいと考えました。書くときに生まれる一瞬の小さな感覚に、具体的な<img class=\"inline-word-image\" src=\"huan2.png\" alt=\"かたち\">を与える試みです。",
+          "ウェブサイトは、このブランド・アイデンティティの出発点です。見る人がペンを手に取り一本の線を描くと、その線は毎回異なる動きを続けます。そこから生まれたランダムな線をもとに、グラフィック、構図、モーションの言語が展開し、パッケージや印刷物など、さまざまなメディア<img class=\"inline-word-image\" src=\"dao.png\" alt=\"へ\">広がっていきます。",
+          "まだ実際にこのペンを使ったことがなくても、変化し続けるこのビジュアル<img class=\"inline-word-image is-extra-wide\" src=\"huan4.png\" alt=\"システム\">を通して、書くことに宿る不思議な力を感じ、思わず自分の<img class=\"inline-word-image is-wide\" src=\"handd.png\" alt=\"手\">で試してみたくなることを願っています。"
         ]
       },
 
@@ -2058,17 +2104,17 @@ BوB Tokyo Jingumae Shop
           "日本东京都涩谷区神宫前 1-14-23"
         ],
         paragraphs: [
-          "BوB 读作 BwaB，是一家来自埃及、专注于圆珠笔与书写体验的品牌。",
+          "BوB 读作 BwaB，是一家来自埃及、专注于圆珠笔与书写体验<img class=\"inline-word-image\" src=\"le.png\" alt=\"的\">品牌。",
           "名称中间的 و 来自阿拉伯语，读作 wa，意为“与”或“和”。因此，BوB 也可以理解为 B and B。",
-          "两个 B 最初指向圆珠笔最常见的两种墨水颜色：Black 与 Blue。同时，这个名称没有唯一的解释。BوB 可以是一张鬼脸，也可以是一对双胞胎。两个相同的字母被“与”连接起来，形成了一种并置、对应，又可以不断发散的关系。",
-          "我们关注圆珠笔，也关注书写这一日常而简单的身体行为。笔尖与纸面的接触、手的移动、墨水留下的轨迹，以及书写时产生的速度与阻力，都是构成 BوB 的关键词。因此，我们选择了这个可以容纳多种理解的缩写作为品牌名称。",
-          "以上是关于这个假想品牌的设定。下面是我作为设计师，创造 BوB 的起点。",
-          "这个项目源于一位朋友去埃及旅行时，在街边小店随手买下的一根圆珠笔。",
+          "两个 B 最初指向圆珠笔最常见的两种墨水颜色：Black 与 Blue。同时，<img class=\"inline-word-image is-wide\" src=\"this.png\" alt=\"这个\">名称没有唯一的解释。BوB 可以是一张鬼脸，也可以是一对双胞胎。两个相同的字母被“与”连接起来，形成了一种并置、对应，又可以不断发散的关系。",
+          "我们关注圆珠笔，也关注书写这一日常而简单的身体行为。笔尖与纸面<img class=\"inline-word-image\" src=\"of.png\" alt=\"的\">接触、<img class=\"inline-word-image is-wide\" src=\"handd.png\" alt=\"手\">的<img class=\"inline-word-image\" src=\"huan3.png\" alt=\"移动\">、墨水留下的轨迹，以及书写时产生的速度与阻力，都是构成 BوB 的关键词。因此，我们选择了这个可以容纳多种理解的缩写作为品牌名称。",
+          "以上是关于<img class=\"inline-word-image is-wide\" src=\"this.png\" alt=\"这个\">假想品牌的设定。下面是<img class=\"inline-word-image\" src=\"I.png\" alt=\"我\">作为设计师，创造 BوB 的起点。",
+          "<img class=\"inline-word-image is-wide\" src=\"this.png\" alt=\"这个\">项目源于一位朋友去埃及旅行时，在街边小店随手买下的一根圆珠笔。",
           "它只是一根标有 <span class=\"made-in-egypt\">Made in Egypt</span> 的普通圆珠笔。但在试写的瞬间，我被一种从未体验过的顺滑度震惊了。笔尖划过纸面的触感非常直接，后来也一直停留在我的身体记忆中。",
-          "BوB 从这份记忆里生长出来。",
-          "我想把“这支笔太顺滑了”这一难以转述的感受，转化成一种可以被看见、触摸和参与的品牌体验，让书写时短暂而微小的感受获得具体的形态。",
-          "网页成为这套品牌识别系统的起点。观看者可以拿起笔画出一条线，而每一次生成的线条都会以不同的方式继续运动。品牌中的图形、构图与动态语言，随后从这些随机生长的线条中逐渐展开，并延伸到包装、印刷品与其他媒介之中。",
-          "我希望即使还没有真正使用过这根笔，观看者也能通过这套不断变化的视觉系统，感受到某种来自书写的魔力，并产生亲手试写的欲望。"
+          "BوB 从<img class=\"inline-word-image is-wide\" src=\"this.png\" alt=\"这\">份记忆里<img class=\"inline-word-image is-tall\" src=\"huan1.png\" alt=\"生长\">出来。",
+          "<img class=\"inline-word-image\" src=\"I.png\" alt=\"我\">想把“<img class=\"inline-word-image is-wide\" src=\"this.png\" alt=\"这\">支笔太顺滑了”这一难以转述的感受，转化成一种可以被<img class=\"inline-word-image is-wide\" src=\"eye.png\" alt=\"看见\">、触摸和参与的品牌体验，让书写时短暂而微小的感受获得具体的<img class=\"inline-word-image\" src=\"huan2.png\" alt=\"形态\">。",
+          "网页成为<img class=\"inline-word-image is-wide\" src=\"this.png\" alt=\"这\">套品牌识别<img class=\"inline-word-image is-extra-wide\" src=\"huan4.png\" alt=\"系统\">的起点。观看者可以拿起笔画出一条线，而每一次生成的线条都会以不同的方式继续运动。品牌中的图形、构图与<img class=\"inline-word-image\" src=\"huan3.png\" alt=\"动态\">语言，随后从这些随机生长的线条中逐渐展开，并延伸<img class=\"inline-word-image\" src=\"dao.png\" alt=\"到\">包装、印刷品与其他媒介之中。",
+          "<img class=\"inline-word-image\" src=\"I.png\" alt=\"我\">希望即使还没有真正使用过这根笔，观看者也能通过这套不断变化的视觉系统，感受到某种来自书写的魔力，并产生亲<img class=\"inline-word-image is-wide\" src=\"handd.png\" alt=\"手\">试写的欲望。"
         ]
       },
 
@@ -2085,14 +2131,14 @@ BوB Tokyo Jingumae Shop
           "BوB علامة مصرية متخصصة في أقلام الحبر الجاف وتجربة الكتابة.",
           "يربط حرف الواو بين حرفي B، ولذلك يمكن فهم الاسم أيضًا بمعنى B and B.",
           "يشير حرفا B في البداية إلى اللونين الأكثر شيوعًا في أحبار الأقلام: الأسود والأزرق. ومع ذلك، لا يقتصر الاسم على تفسير واحد؛ فقد يبدو BوB كوجه، أو كتوأمين. وحين تجمع الواو بين حرفين متماثلين، تنشأ علاقة من التجاور والتناظر تفتح المجال لتأويلات متجددة.",
-          "نهتم بالقلم، وبالكتابة بوصفها فعلًا جسديًا يوميًا وبسيطًا. ملامسة السن للورق، وحركة اليد، وأثر الحبر، والسرعة والمقاومة أثناء الكتابة؛ كلها مفردات تكوّن عالم BوB. لهذا اخترنا اسمًا مختصرًا يتسع لأكثر من معنى.",
-          "ما سبق هو التصور الذي تقوم عليه هذه العلامة المتخيلة. أما ما يلي، فهو بداية الحكاية التي دفعتني، بصفتي المصمم، إلى ابتكار BوB.",
+          "نهتم بالقلم، وبالكتابة بوصفها فعلًا جسديًا يوميًا وبسيطًا. ملامسة السن للورق، و<span class=\"inline-word-token\" dir=\"ltr\"><img class=\"inline-word-image\" src=\"huan3.png\" alt=\"حركة\"></span> <span class=\"inline-word-token\" dir=\"ltr\"><img class=\"inline-word-image is-wide\" src=\"handd.png\" alt=\"اليد\"></span>، وأثر الحبر، والسرعة والمقاومة أثناء الكتابة؛ كلها مفردات تكوّن عالم BوB. لهذا اخترنا اسمًا مختصرًا يتسع لأكثر من معنى.",
+          "ما سبق هو التصور الذي تقوم عليه <span class=\"inline-word-token\" dir=\"ltr\"><img class=\"inline-word-image is-wide\" src=\"this.png\" alt=\"هذه\"></span> العلامة المتخيلة. أما ما يلي، فهو بداية الحكاية التي دفعتني، بصفتي المصمم، إلى ابتكار BوB.",
           "بدأ المشروع بقلم حبر جاف اشتراه صديق بالمصادفة من متجر صغير في أحد شوارع مصر خلال رحلة هناك.",
           "كان قلمًا عاديًا يحمل عبارة <span class=\"made-in-egypt\" dir=\"ltr\">Made in Egypt</span>. عندما جرّبت الكتابة به، فاجأتني سلاسة لم أعرفها من قبل. كان مرور السن فوق الورق إحساسًا مباشرًا ظل حاضرًا في ذاكرتي الجسدية.",
-          "من هذه الذاكرة نشأت BوB.",
-          "أردت أن أحوّل الإحساس الذي يصعب وصفه—«هذا القلم سلس إلى حد مدهش»—إلى تجربة بصرية وملموسة يمكن المشاركة فيها، وأن أمنح الأحاسيس الصغيرة والعابرة المصاحبة للكتابة شكلًا محسوسًا.",
-          "كان الموقع الإلكتروني نقطة انطلاق نظام الهوية البصرية. يستطيع الزائر أن يمسك القلم ويرسم خطًا، ثم يواصل كل خط حركته بطريقة مختلفة. ومن هذه الخطوط المتولدة عشوائيًا تطورت الأشكال والتكوينات ولغة الحركة، ثم امتدت إلى التغليف والمطبوعات ووسائط أخرى.",
-          "آمل أن يتيح هذا النظام البصري المتغير للمشاهد أن يلمس شيئًا من سحر الكتابة، حتى قبل أن يستخدم القلم فعليًا، وأن يشعر برغبة في تجربته بيده."
+          "من هذه الذاكرة <span class=\"inline-word-token\" dir=\"ltr\"><img class=\"inline-word-image is-tall\" src=\"huan1.png\" alt=\"نشأت\"></span> BوB.",
+          "أردت أن أحوّل الإحساس الذي يصعب وصفه—«هذا القلم سلس إلى حد مدهش»—<span class=\"inline-word-token\" dir=\"ltr\"><img class=\"inline-word-image\" src=\"dao.png\" alt=\"إلى\"></span> تجربة بصرية وملموسة يمكن المشاركة فيها، وأن أمنح الأحاسيس الصغيرة والعابرة المصاحبة للكتابة <span class=\"inline-word-token\" dir=\"ltr\"><img class=\"inline-word-image\" src=\"huan2.png\" alt=\"شكلًا\"></span> محسوسًا.",
+          "كان الموقع الإلكتروني نقطة انطلاق <span class=\"inline-word-token\" dir=\"ltr\"><img class=\"inline-word-image is-extra-wide\" src=\"huan4.png\" alt=\"نظام\"></span> الهوية البصرية. يستطيع الزائر أن يمسك القلم ويرسم خطًا، ثم يواصل كل خط حركته بطريقة مختلفة. ومن <span class=\"inline-word-token\" dir=\"ltr\"><img class=\"inline-word-image is-wide\" src=\"this.png\" alt=\"هذه\"></span> الخطوط المتولدة عشوائيًا تطورت الأشكال والتكوينات ولغة الحركة، ثم امتدت إلى التغليف والمطبوعات ووسائط أخرى.",
+          "آمل أن يتيح هذا النظام البصري المتغير <span class=\"inline-word-token\" dir=\"ltr\"><img class=\"inline-word-image is-wide\" src=\"eye.png\" alt=\"للمشاهد\"></span> أن يلمس شيئًا من سحر الكتابة، حتى قبل أن يستخدم القلم فعليًا، وأن يشعر برغبة في تجربته بيده."
         ]
       }
     };
@@ -2130,6 +2176,7 @@ BوB Tokyo Jingumae Shop
     let livingStroke = [];
     let livingSegments = [];
     let livingSegmentMeta = [];
+    let penLanguagePhrases = [];
     let animationId = null;
     let currentAnimationType = null;
     let khepriLastEraseX = null;
@@ -2238,6 +2285,17 @@ BوB Tokyo Jingumae Shop
       "EN1_phone.png",
       "EN2_phone.png",
       "EN3_phone.png",
+      "I.png",
+      "this.png",
+      "le.png",
+      "of.png",
+      "eye.png",
+      "handd.png",
+      "dao.png",
+      "huan1.png",
+      "huan2.png",
+      "huan3.png",
+      "huan4.png",
       "pen_bb_1.png",
       "pen_bb_2.png",
       "pen_bw_1.png",
@@ -2657,6 +2715,7 @@ BوB Tokyo Jingumae Shop
       livingStroke = [];
       livingSegments = [];
       livingSegmentMeta = [];
+      penLanguagePhrases = [];
       lastPoint = null;
       isDrawing = false;
       hasMoved = false;
@@ -3159,7 +3218,24 @@ khepriButton.addEventListener("click", async (event) => {
       khepriMouseIdleTimer = setTimeout(() => {
         if (!isKhepriCrawlerLayout() || khepriHovered || isSelected) return;
 
-        const target = clampKhepriPoint(khepriPointerX, khepriPointerY);
+        let target;
+        const aboutRect = home.classList.contains("about-open")
+          ? getAboutReadingRect()
+          : null;
+
+        if (aboutRect) {
+          const size = getKhepriApproxSize();
+          const probeX = aboutRect.left - size.width * 0.62 - 28;
+          const probeY = clampNumber(
+            khepriPointerY + (Math.random() - 0.5) * size.height * 0.7,
+            aboutRect.top + size.height * 0.55,
+            aboutRect.bottom - size.height * 0.55
+          );
+          target = clampKhepriPoint(probeX, probeY);
+        } else {
+          target = clampKhepriPoint(khepriPointerX, khepriPointerY);
+        }
+
         khepriTargetX = target.x;
         khepriTargetY = target.y;
         startKhepriCrawlerLoop();
@@ -3377,11 +3453,17 @@ khepriButton.addEventListener("click", async (event) => {
         KHEPRI_ABOUT_ESCAPE_PADDING
       );
 
-      if (!isInReadingArea) {
+      const escapePoint = getKhepriAboutEscapePoint(rect);
+
+      if (!isInReadingArea && !isPointInsideRectWithPadding(
+        khepriTargetX,
+        khepriTargetY,
+        rect,
+        KHEPRI_ABOUT_ESCAPE_PADDING
+      )) {
         return false;
       }
 
-      const escapePoint = getKhepriAboutEscapePoint(rect);
       commandKhepriToPoint(escapePoint.x, escapePoint.y);
 
       return true;
@@ -3855,15 +3937,19 @@ khepriButton.addEventListener("click", async (event) => {
       hasMoved = false;
       lastPoint = null;
       currentStroke = [];
-      livingSegments = [];
-      livingSegmentMeta = [];
-      livingStroke = [];
 
       lastMouseX = mouseX;
       lastMouseY = mouseY;
 
-      stopLivingStroke();
-      clearCanvas();
+      /* Every previous human stroke and pen utterance remains on the same page. */
+      if (penLanguagePhrases.length > 0 || livingSegments.length > 0) {
+        if (!animationId) {
+          animationId = requestAnimationFrame(animateStroke);
+        }
+      } else {
+        stopLivingStroke();
+        clearCanvas();
+      }
 
       pauseKhepriCrawler(0);
 
@@ -4083,9 +4169,9 @@ khepriButton.addEventListener("click", async (event) => {
       livingInkColor = getCurrentInkColor();
       livingInkMode = getCurrentInkMode();
 
-      livingStroke = simplified;
-      livingSegments = [simplified];
-      livingSegmentMeta = [createSegmentMeta(0, false, livingInkMode)];
+      livingSegments.push(simplified);
+      livingSegmentMeta.push(createSegmentMeta(livingSegments.length - 1, false, livingInkMode));
+      rebuildLivingStrokeFromSegments();
       currentAnimationType = null;
       khepriLastEraseX = null;
       khepriLastEraseY = null;
@@ -4096,8 +4182,15 @@ khepriButton.addEventListener("click", async (event) => {
       clearCanvas();
 
       livingSegments = livingSegments.filter((segment) => segment.length >= 2);
+      penLanguagePhrases = penLanguagePhrases.filter((phrase) => time - phrase.bornAt < phrase.lifeDuration);
 
-      if (livingSegments.length === 0) {
+      while (penLanguagePhrases.filter((phrase) => time - phrase.bornAt >= phrase.growDuration).length > 4) {
+        const oldestCompletedIndex = penLanguagePhrases.findIndex((phrase) => time - phrase.bornAt >= phrase.growDuration);
+        if (oldestCompletedIndex < 0) break;
+        penLanguagePhrases.splice(oldestCompletedIndex, 1);
+      }
+
+      if (livingSegments.length === 0 && penLanguagePhrases.length === 0) {
         stopLivingStroke();
         return;
       }
@@ -4121,6 +4214,41 @@ khepriButton.addEventListener("click", async (event) => {
           drawFlowStroke(time, segment, meta, index);
         }
       });
+
+      penLanguagePhrases.forEach((phrase, phraseIndex) => {
+        const age = Math.max(0, time - phrase.bornAt);
+        const growth = Math.min(1, age / phrase.growDuration);
+        const easedGrowth = 1 - Math.pow(1 - growth, 3);
+        const meta = phrase.meta;
+        const remaining = phrase.lifeDuration - age;
+        const opacity = Math.max(0, Math.min(1, remaining / phrase.fadeDuration));
+        const segmentsToDraw = growth < 1 ?
+          [phrase.points.slice(0, Math.max(2, Math.ceil(phrase.points.length * easedGrowth)))] :
+          (phrase.segments || [phrase.points]);
+
+        ctx.save();
+        ctx.globalAlpha = opacity;
+
+        segmentsToDraw.forEach((visiblePoints, segmentOffset) => {
+          if (visiblePoints.length < 2) return;
+          const renderIndex = phraseIndex * 7 + segmentOffset;
+
+          if (meta.type === "blueWave") {
+            drawBlueWaveStroke(time, visiblePoints, meta, renderIndex);
+          } else {
+            drawWriggleStroke(time, visiblePoints, meta, renderIndex);
+          }
+        });
+
+        ctx.restore();
+      });
+
+      /* The visitor's unfinished reply sits above the pen's moving language. */
+      if (isDrawing && currentStroke.length > 1) {
+        for (let i = 1; i < currentStroke.length; i += 1) {
+          drawLine(currentStroke[i - 1], currentStroke[i]);
+        }
+      }
 
       animationId = requestAnimationFrame(animateStroke);
     }
@@ -4293,13 +4421,55 @@ khepriButton.addEventListener("click", async (event) => {
       strokeBlueInkPolyline(points, time, meta, segmentIndex, 0.45);
     }
 
+    function erasePenLanguageAt(x, y, radius) {
+      if (!penLanguagePhrases.length) return false;
+
+      const radiusSq = radius * radius;
+      let changed = false;
+
+      penLanguagePhrases.forEach((phrase) => {
+        if (performance.now() - phrase.bornAt < phrase.growDuration) return;
+
+        const sourceSegments = phrase.segments || [phrase.points];
+        const newSegments = [];
+
+        sourceSegments.forEach((segment) => {
+          let piece = [];
+
+          segment.forEach((point) => {
+            const dx = point.x - x;
+            const dy = point.y - y;
+
+            if (dx * dx + dy * dy <= radiusSq) {
+              changed = true;
+              if (piece.length >= KHEPRI_MIN_SEGMENT_POINTS) newSegments.push(piece);
+              piece = [];
+            } else {
+              piece.push(point);
+            }
+          });
+
+          if (piece.length >= KHEPRI_MIN_SEGMENT_POINTS) newSegments.push(piece);
+        });
+
+        phrase.segments = newSegments;
+      });
+
+      if (changed) {
+        penLanguagePhrases = penLanguagePhrases.filter((phrase) => !phrase.segments || phrase.segments.length > 0);
+      }
+
+      return changed;
+    }
+
     function eraseLivingStrokeAt(x, y, radius) {
-      if (!livingSegments.length) return false;
+      if (!livingSegments.length && !penLanguagePhrases.length) return false;
 
       const radiusSq = radius * radius;
       const newSegments = [];
       const newMeta = [];
-      let changed = false;
+      let changed = erasePenLanguageAt(x, y, radius);
+      let humanChanged = false;
 
       livingSegments.forEach((segment, segmentIndex) => {
         let piece = [];
@@ -4311,6 +4481,7 @@ khepriButton.addEventListener("click", async (event) => {
 
           if (shouldErase) {
             changed = true;
+            humanChanged = true;
 
             if (piece.length >= KHEPRI_MIN_SEGMENT_POINTS) {
               newSegments.push(piece);
@@ -4325,17 +4496,19 @@ khepriButton.addEventListener("click", async (event) => {
 
         if (piece.length >= KHEPRI_MIN_SEGMENT_POINTS) {
           newSegments.push(piece);
-          newMeta.push(changed ? createSegmentMeta(newSegments.length, true, livingInkMode) : (livingSegmentMeta[segmentIndex] || createSegmentMeta(segmentIndex, false, livingInkMode)));
+          newMeta.push(humanChanged ? createSegmentMeta(newSegments.length, true, livingInkMode) : (livingSegmentMeta[segmentIndex] || createSegmentMeta(segmentIndex, false, livingInkMode)));
         }
       });
 
       if (!changed) return false;
 
-      livingSegments = newSegments;
-      livingSegmentMeta = newMeta;
-      rebuildLivingStrokeFromSegments();
+      if (humanChanged) {
+        livingSegments = newSegments;
+        livingSegmentMeta = newMeta;
+        rebuildLivingStrokeFromSegments();
+      }
 
-      if (livingSegments.length === 0) {
+      if (livingSegments.length === 0 && penLanguagePhrases.length === 0) {
         stopLivingStroke();
         clearCanvas();
       }
@@ -4344,7 +4517,7 @@ khepriButton.addEventListener("click", async (event) => {
     }
 
     function eraseLivingStrokeByKhepriTrail(x, y, directionX, directionY) {
-      if (!livingSegments.length) return;
+      if (!livingSegments.length && !penLanguagePhrases.length) return;
 
       const size = getKhepriApproxSize();
       const core = Math.min(size.width, size.height);
@@ -4366,6 +4539,215 @@ khepriButton.addEventListener("click", async (event) => {
       eraseLivingStrokeAt(eraseX, eraseY, radius);
     }
 
+    /*
+      The click stays silent. Instead, the pen translates that small mechanical
+      event into a one-stroke utterance: it grows from the nib, then joins the
+      same living-line system as a line drawn by the visitor.
+    */
+    function getPenLanguageScale() {
+      const base = Math.min(window.innerWidth, window.innerHeight);
+      const r = Math.random();
+
+      if (r < 0.25) return base * (0.10 + Math.random() * 0.08);
+      if (r < 0.60) return base * (0.20 + Math.random() * 0.12);
+      if (r < 0.90) return base * (0.38 + Math.random() * 0.22);
+      return base * (0.68 + Math.random() * 0.25);
+    }
+
+    function makeFigurativePhrase(kind) {
+      const points = [];
+      const add = (x, y) => points.push({ x, y });
+
+      if (kind === "eye") {
+        for (let i = 0; i <= 36; i += 1) {
+          const t = i / 36;
+          add(-1 + t * 2, -Math.sin(t * Math.PI) * 0.42);
+        }
+        for (let i = 0; i <= 36; i += 1) {
+          const t = i / 36;
+          add(1 - t * 2, Math.sin(t * Math.PI) * 0.42);
+        }
+        for (let i = 0; i <= 30; i += 1) {
+          const t = i / 30;
+          const radius = 0.28 * (1 - t * 0.42);
+          add(-1 + t + Math.cos(t * Math.PI * 3) * radius, Math.sin(t * Math.PI * 3) * radius);
+        }
+      } else if (kind === "hand") {
+        [
+          [-0.72,0.72],[-0.62,0.18],[-0.70,-0.30],[-0.56,-0.38],[-0.42,0.08],
+          [-0.38,-0.72],[-0.20,-0.78],[-0.12,0.02],[-0.02,-0.92],[0.17,-0.90],
+          [0.20,0.02],[0.36,-0.74],[0.54,-0.68],[0.43,0.16],[0.72,-0.34],
+          [0.84,-0.20],[0.58,0.44],[0.34,0.74],[-0.10,0.90],[-0.72,0.72]
+        ].forEach((point) => add(point[0], point[1]));
+      } else if (kind === "leg") {
+        [
+          [-0.38,-0.94],[-0.18,-0.34],[-0.10,0.18],[-0.28,0.72],[-0.60,0.88],
+          [-0.76,0.76],[-0.32,0.54],[0.02,0.06],[0.30,-0.46],[0.44,-0.88],
+          [0.30,-0.96],[0.02,-0.46],[-0.10,0.06],[-0.38,-0.94]
+        ].forEach((point) => add(point[0], point[1]));
+      } else if (kind === "body") {
+        [
+          [-0.12,-0.92],[-0.48,-0.62],[-0.72,-0.14],[-0.48,0.02],[-0.34,0.66],
+          [-0.08,0.94],[0.10,0.60],[0.42,0.82],[0.34,0.14],[0.72,-0.10],
+          [0.42,-0.62],[0.12,-0.92],[-0.12,-0.92]
+        ].forEach((point) => add(point[0], point[1]));
+      } else if (kind === "star") {
+        const outer = 0.92;
+        const inner = 0.34 + Math.random() * 0.12;
+        for (let i = 0; i <= 10; i += 1) {
+          const radius = i % 2 === 0 ? outer : inner;
+          const angle = -Math.PI * 0.5 + i * Math.PI / 5;
+          add(Math.cos(angle) * radius, Math.sin(angle) * radius);
+        }
+      } else {
+        for (let i = 0; i <= 54; i += 1) {
+          const t = i / 54;
+          add(Math.cos(t * Math.PI * 2) * 0.48, Math.sin(t * Math.PI * 2) * 0.72);
+        }
+        const legs = [[-0.42,-0.34,-0.9,-0.62],[-0.48,0,-0.98,0],[-0.42,0.34,-0.9,0.62],[0.42,-0.34,0.9,-0.62],[0.48,0,0.98,0],[0.42,0.34,0.9,0.62]];
+        legs.forEach((leg) => {
+          add(leg[0], leg[1]);
+          add(leg[2], leg[3]);
+          add(leg[0], leg[1]);
+        });
+        for (let i = 0; i <= 24; i += 1) {
+          const t = i / 24;
+          add(Math.cos(t * Math.PI) * 0.34, -0.72 - Math.sin(t * Math.PI) * 0.30);
+        }
+      }
+
+      return points;
+    }
+
+    function transformPenLanguagePhrase(points, scale, origin, rotation) {
+      const cos = Math.cos(rotation);
+      const sin = Math.sin(rotation);
+
+      return points.map((point) => ({
+        x: origin.x + (point.x * cos - point.y * sin) * scale,
+        y: origin.y + (point.x * sin + point.y * cos) * scale
+      }));
+    }
+
+    function makeAbstractPhrase(origin, scale) {
+      const points = [{ x: origin.x, y: origin.y }];
+      const margin = 18;
+
+      /* Broad phrases: long straight runs with only a few decisive turns. */
+      if (Math.random() < 0.58) {
+        let x = origin.x;
+        let y = origin.y;
+        let angle = Math.atan2(window.innerHeight * 0.5 - y, window.innerWidth * 0.5 - x) + (Math.random() - 0.5) * 2.4;
+        const sectionCount = 2 + Math.floor(Math.random() * 5);
+
+        for (let section = 0; section < sectionCount; section += 1) {
+          const sectionLength = scale * (0.48 + Math.random() * 0.75);
+          const steps = Math.max(10, Math.round(sectionLength / 8));
+          const stepLength = sectionLength / steps;
+
+          for (let i = 1; i <= steps; i += 1) {
+            x += Math.cos(angle) * stepLength;
+            y += Math.sin(angle) * stepLength;
+
+            if (x < margin || x > window.innerWidth - margin) {
+              x = Math.max(margin, Math.min(window.innerWidth - margin, x));
+              angle = Math.PI - angle;
+            }
+            if (y < margin || y > window.innerHeight - margin) {
+              y = Math.max(margin, Math.min(window.innerHeight - margin, y));
+              angle = -angle;
+            }
+
+            points.push({ x, y });
+          }
+
+          const turns = [-1.35, -0.82, -0.48, 0, 0.48, 0.82, 1.35];
+          angle += turns[Math.floor(Math.random() * turns.length)] + (Math.random() - 0.5) * 0.16;
+        }
+
+        return points;
+      }
+
+      const total = Math.max(45, Math.round(55 + scale * 0.16));
+      let x = origin.x;
+      let y = origin.y;
+      let angle = Math.atan2(window.innerHeight * 0.5 - y, window.innerWidth * 0.5 - x) + (Math.random() - 0.5) * 2.2;
+      let turn = 0;
+      const step = Math.max(3.5, Math.min(10, scale / 30));
+
+      for (let i = 1; i < total; i += 1) {
+        turn = turn * 0.82 + (Math.random() - 0.5) * 0.16;
+        angle += turn + Math.sin(i * 0.19) * 0.028;
+        x += Math.cos(angle) * step * (0.7 + Math.random() * 0.65);
+        y += Math.sin(angle) * step * (0.7 + Math.random() * 0.65);
+
+        if (x < margin || x > window.innerWidth - margin) {
+          angle = Math.PI - angle;
+          x = Math.max(margin, Math.min(window.innerWidth - margin, x));
+        }
+        if (y < margin || y > window.innerHeight - margin) {
+          angle = -angle;
+          y = Math.max(margin, Math.min(window.innerHeight - margin, y));
+        }
+        points.push({ x, y });
+      }
+      return points;
+    }
+
+    function createPenLanguageStroke() {
+      const scale = getPenLanguageScale();
+      const margin = Math.min(scale * 0.55, Math.min(window.innerWidth, window.innerHeight) * 0.22);
+      const fromNib = Math.random() < 0.60;
+      const tip = getPenTipPoint();
+      const origin = fromNib ? {
+        x: Math.max(20, Math.min(window.innerWidth - 20, tip.x)),
+        y: Math.max(20, Math.min(window.innerHeight - 20, tip.y))
+      } : {
+        x: margin + Math.random() * Math.max(1, window.innerWidth - margin * 2),
+        y: margin + Math.random() * Math.max(1, window.innerHeight - margin * 2)
+      };
+
+      const figurative = Math.random() < 0.08;
+      if (!figurative) return makeAbstractPhrase(origin, scale);
+
+      const kinds = ["eye"];
+      const kind = kinds[Math.floor(Math.random() * kinds.length)];
+      return transformPenLanguagePhrase(
+        makeFigurativePhrase(kind),
+        scale,
+        origin,
+        (Math.random() - 0.5) * 1.15
+      );
+    }
+
+    function speakPenLanguage() {
+      const points = createPenLanguageStroke();
+      if (points.length < 2) return;
+
+      const mode = getCurrentInkMode();
+      const phraseMeta = createSegmentMeta(penLanguagePhrases.length, false, mode);
+
+      /* Automatic speech must remain continuous and visually comfortable. */
+      phraseMeta.type = mode === "blue" ? "blueWave" : "wriggle";
+      phraseMeta.amp = 0.48 + Math.random() * 0.34;
+      phraseMeta.speed = 0.42 + Math.random() * 0.28;
+
+      const phrase = {
+        points,
+        bornAt: performance.now(),
+        growDuration: 520 + Math.random() * 720,
+        lifeDuration: 14000 + Math.random() * 8000,
+        fadeDuration: mode === "blue" ? 650 : 3000,
+        meta: phraseMeta
+      };
+
+      penLanguagePhrases.push(phrase);
+
+      if (!animationId) {
+        animationId = requestAnimationFrame(animateStroke);
+      }
+    }
+
     pressButton.addEventListener("pointerdown", (event) => {
       event.stopPropagation();
     });
@@ -4379,6 +4761,7 @@ khepriButton.addEventListener("click", async (event) => {
 
       isPressed = !isPressed;
       updatePenImage();
+      speakPenLanguage();
 
       if (!step1Done) {
         step1Done = true;
