@@ -526,6 +526,7 @@ body.mobile-about-scroll-active {
       /* A slightly tighter measure keeps justified English from opening
          conspicuous holes around the large inline drawings. */
       word-spacing: -0.075em;
+      text-align-last: left;
     }
 
     .made-in-egypt {
@@ -574,6 +575,25 @@ body.mobile-about-scroll-active {
       margin-right: 0.06em;
     }
 
+    .image-punctuation {
+      display: inline-block;
+      width: auto;
+      height: 2.01em;
+      margin: 0 0.14em;
+      object-fit: contain;
+      vertical-align: -0.69em;
+      unicode-bidi: isolate;
+      user-select: none;
+      -webkit-user-select: none;
+      pointer-events: none;
+    }
+
+    .image-punctuation.is-punctuation-tall {
+      height: 3.225em;
+      margin-inline: 0.1em;
+      vertical-align: -1.275em;
+    }
+
     .home.lang-jp .about-content p,
     .home.lang-cn .about-content p {
       letter-spacing: -0.025em;
@@ -582,6 +602,7 @@ body.mobile-about-scroll-active {
       word-spacing: 0;
       line-break: strict;
       word-break: normal;
+      text-align-last: left;
     }
 
     .home.lang-ar .about-content p {
@@ -591,6 +612,7 @@ body.mobile-about-scroll-active {
       word-spacing: -0.025em;
       hyphens: none;
       -webkit-hyphens: none;
+      text-align-last: right;
     }
 
     @media (min-width: 701px) {
@@ -2455,6 +2477,98 @@ BوB Tokyo Jingumae Shop
       });
     }
 
+    function restoreAboutWords() {
+      const wordImages = Array.from(aboutBody.querySelectorAll(".about-paragraphs .inline-word-image"));
+
+      wordImages.forEach((image) => {
+        const word = image.alt || "";
+        const token = image.closest(".inline-word-token");
+
+        /* English tokens sometimes retained an initial letter beside the image.
+           Replacing the whole token avoids results such as Tthis or Hhand. */
+        if (token) {
+          token.replaceWith(document.createTextNode(word));
+        } else {
+          image.replaceWith(document.createTextNode(word));
+        }
+      });
+    }
+
+    function applyImagePunctuation(lang) {
+      const paragraphs = Array.from(aboutBody.querySelectorAll(".about-paragraphs p"));
+      const punctuationPattern = lang === "ar" ?
+        /[،؛,.!:؟?…—–]+/g :
+        (lang === "cn" || lang === "jp") ?
+          /[，。；：！？、,.!?…—–／・〜]+/g :
+          /[,.!?;:…—–]+/g;
+      const images = [
+        "I.png", "huan2.png", "eye.png", "le.png", "huan4.png",
+        "handd.png", "this.png", "huan3.png", "dao.png", "huan1.png", "of.png"
+      ];
+      const languageOffset = { en: 0, jp: 3, cn: 6, ar: 9 }[lang] || 0;
+      let punctuationIndex = 0;
+
+      paragraphs.forEach((paragraph) => {
+        const walker = document.createTreeWalker(paragraph, NodeFilter.SHOW_TEXT);
+        const textNodes = [];
+        let textNode;
+
+        while ((textNode = walker.nextNode())) {
+          if (textNode.parentElement && textNode.parentElement.closest(".made-in-egypt")) continue;
+          textNodes.push(textNode);
+        }
+
+        textNodes.forEach((node) => {
+          const value = node.nodeValue;
+          const pattern = new RegExp(punctuationPattern.source, "g");
+          let match;
+          let cursor = 0;
+          let changed = false;
+          const fragment = document.createDocumentFragment();
+
+          while ((match = pattern.exec(value))) {
+            changed = true;
+            const isTerminalMark = node === textNodes[textNodes.length - 1] &&
+              value.slice(pattern.lastIndex).trim() === "";
+            const beforeMark = value
+              .slice(cursor, match.index)
+              .replace(/^\s+/, "")
+              .replace(/\s+$/, "");
+
+            if (beforeMark) {
+              fragment.append(document.createTextNode(beforeMark));
+            }
+
+            /* A punctuation mark normally owns space on only one side. Once it
+               becomes an image, give justification two equal spaces to expand,
+               so the image remains centered in the resulting gap. */
+            if (!isTerminalMark && (beforeMark || fragment.childNodes.length > 0)) {
+              fragment.append(document.createTextNode(" "));
+            }
+
+            const src = images[(punctuationIndex + languageOffset) % images.length];
+            const image = document.createElement("img");
+            image.className = "image-punctuation" + (src === "huan1.png" ? " is-punctuation-tall" : "");
+            image.src = src;
+            image.alt = match[0];
+            image.setAttribute("aria-label", match[0]);
+            fragment.append(image);
+            if (!isTerminalMark) {
+              fragment.append(document.createTextNode(" "));
+            }
+
+            punctuationIndex += 1;
+            cursor = match.index + match[0].length;
+          }
+
+          if (changed) {
+            fragment.append(document.createTextNode(value.slice(cursor).replace(/^\s+/, "")));
+            node.replaceWith(fragment);
+          }
+        });
+      });
+    }
+
     function updateAboutTexts(lang) {
       const data = aboutTexts[lang];
 
@@ -2463,7 +2577,7 @@ BوB Tokyo Jingumae Shop
       aboutBody.innerHTML = `
         <h2 class="about-title">${data.title}</h2>
         <div class="about-paragraphs">
-          ${data.paragraphs.map((paragraph) => `<p>${paragraph}</p>`).join("")}
+          <p>${data.paragraphs.join(" ")}</p>
         </div>
 
         <section class="mobile-shop">
@@ -2481,6 +2595,9 @@ BوB Tokyo Jingumae Shop
           </div>
         </section>
       `;
+
+      restoreAboutWords();
+      applyImagePunctuation(lang);
     }
 
     function setLanguage(lang) {
