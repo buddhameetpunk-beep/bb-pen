@@ -523,12 +523,20 @@ body.mobile-about-scroll-active {
     }
 
     .home.lang-en .about-content p {
-      /* A slightly tighter measure keeps justified English from opening
-         conspicuous holes around the large inline drawings. */
-      text-align: left;
-      word-spacing: -0.075em;
+      text-align: justify;
+      text-justify: inter-character;
+      word-spacing: -0.09em;
+      letter-spacing: -0.025em;
       text-align-last: left;
-      text-wrap: wrap;
+      text-wrap: pretty;
+      hyphens: auto;
+      -webkit-hyphens: auto;
+      hyphenate-limit-chars: 6 3 3;
+      hyphenate-limit-lines: 2;
+    }
+
+    .home.lang-en .image-punctuation {
+      margin-inline: 0.28em;
     }
 
     .made-in-egypt {
@@ -591,9 +599,21 @@ body.mobile-about-scroll-active {
     }
 
     .image-punctuation.is-punctuation-tall {
-      height: 3.225em;
+      height: 3.05em;
       margin-inline: 0.1em;
-      vertical-align: -1.275em;
+      vertical-align: -1.2em;
+      transform: scale(1.08);
+      transform-origin: center;
+    }
+
+    .image-punctuation.is-punctuation-of {
+      height: 2.5em;
+      vertical-align: -0.9em;
+    }
+
+    .image-punctuation.is-punctuation-large {
+      height: 2.16em;
+      vertical-align: -0.77em;
     }
 
     .home.lang-jp .about-content p,
@@ -615,6 +635,12 @@ body.mobile-about-scroll-active {
       hyphens: none;
       -webkit-hyphens: none;
       text-align-last: right;
+    }
+
+    /* Keep every body line on one shared vertical grid. The value is tall
+       enough to contain huan1, so image-free lines no longer collapse. */
+    .home .about-content .about-paragraphs p {
+      line-height: 2.95;
     }
 
     @media (min-width: 701px) {
@@ -1407,10 +1433,12 @@ body.mobile-about-scroll-active {
       }
 
       .home.lang-en .about-content p {
-        text-align: left;
+        text-align: justify;
+        text-justify: inter-character;
         text-align-last: left;
-        text-wrap: wrap;
-        word-spacing: -0.075em;
+        text-wrap: pretty;
+        word-spacing: -0.09em;
+        letter-spacing: -0.03em;
       }
 
       .home.lang-jp .about-content p,
@@ -1420,6 +1448,10 @@ body.mobile-about-scroll-active {
 
       .home.lang-ar .about-content p {
         line-height: 1.50;
+      }
+
+      .home .about-content .about-paragraphs p {
+        line-height: 2.95;
       }
 
       .mobile-shop {
@@ -2554,18 +2586,29 @@ BوB Tokyo Jingumae Shop
                becomes an image, give justification two equal spaces to expand,
                so the image remains centered in the resulting gap. */
             if (!isTerminalMark && (beforeMark || fragment.childNodes.length > 0)) {
-              fragment.append(document.createTextNode(" "));
+              if (lang === "en") {
+                fragment.append(document.createElement("wbr"));
+              } else {
+                fragment.append(document.createTextNode(" "));
+              }
             }
 
             const src = images[(punctuationIndex + languageOffset) % images.length];
             const image = document.createElement("img");
-            image.className = "image-punctuation" + (src === "huan1.png" ? " is-punctuation-tall" : "");
+            image.className = "image-punctuation" +
+              (src === "huan1.png" ? " is-punctuation-tall" :
+                src === "of.png" ? " is-punctuation-of" :
+                  (src === "I.png" || src === "le.png") ? " is-punctuation-large" : "");
             image.src = src;
             image.alt = match[0];
             image.setAttribute("aria-label", match[0]);
             fragment.append(image);
             if (!isTerminalMark) {
-              fragment.append(document.createTextNode(" "));
+              if (lang === "en") {
+                fragment.append(document.createElement("wbr"));
+              } else {
+                fragment.append(document.createTextNode(" "));
+              }
             }
 
             punctuationIndex += 1;
