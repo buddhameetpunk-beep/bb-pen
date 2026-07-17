@@ -525,8 +525,10 @@ body.mobile-about-scroll-active {
     .home.lang-en .about-content p {
       /* A slightly tighter measure keeps justified English from opening
          conspicuous holes around the large inline drawings. */
+      text-align: left;
       word-spacing: -0.075em;
       text-align-last: left;
+      text-wrap: wrap;
     }
 
     .made-in-egypt {
@@ -1404,6 +1406,13 @@ body.mobile-about-scroll-active {
         margin-bottom: 9px;
       }
 
+      .home.lang-en .about-content p {
+        text-align: left;
+        text-align-last: left;
+        text-wrap: wrap;
+        word-spacing: -0.075em;
+      }
+
       .home.lang-jp .about-content p,
       .home.lang-cn .about-content p {
         line-height: 1.40;
@@ -1452,8 +1461,8 @@ body.mobile-about-scroll-active {
         font-size: clamp(12px, 3.2vw, 15px);
         line-height: 1.24;
         letter-spacing: -0.035em;
-        text-align: left;
-        text-align-last: left;
+        text-align: left !important;
+        text-align-last: left !important;
         text-justify: auto;
         text-wrap: pretty;
         word-spacing: normal;
@@ -1462,17 +1471,18 @@ body.mobile-about-scroll-active {
       }
 
       .home.lang-ar .mobile-shop-grid {
-        direction: rtl;
+        direction: ltr;
       }
 
       .home.lang-ar .mobile-shop {
-        direction: rtl;
-        text-align: right;
+        direction: ltr;
+        text-align: left;
       }
 
       .home.lang-ar .mobile-shop-address {
-        text-align: right;
-        text-align-last: right;
+        direction: rtl;
+        text-align: left;
+        text-align-last: left;
       }
 
       .about-close {
@@ -2108,7 +2118,7 @@ BوB Tokyo Jingumae Shop
         button: "ABOUT US",
         title: "ABOUT US",
         shopTitle: "SHOP",
-        shopLabels: ["EGYPT", "TOKYO"],
+        shopLabels: ["CAIRO", "TOKYO"],
         shopAddresses: [
           "12 Lotus Passage, El-Darb El-Ahmar, Cairo 11511, Egypt",
           "1-14-23 Jingumae, Shibuya-ku, Tokyo 150-0001, Japan"
@@ -2132,7 +2142,7 @@ BوB Tokyo Jingumae Shop
         button: "BوBについて",
         title: "BوBについて",
         shopTitle: "SHOP",
-        shopLabels: ["EGYPT", "TOKYO"],
+        shopLabels: ["CAIRO", "TOKYO"],
         shopAddresses: [
           "12 Lotus Passage, El-Darb El-Ahmar, Cairo 11511, Egypt",
           "東京都渋谷区神宮前 1-14-23"
@@ -2156,7 +2166,7 @@ BوB Tokyo Jingumae Shop
         button: "关于我们",
         title: "关于我们",
         shopTitle: "SHOP",
-        shopLabels: ["埃及", "东京"],
+        shopLabels: ["开罗", "东京"],
         shopAddresses: [
           "12 Lotus Passage, El-Darb El-Ahmar, Cairo 11511, Egypt",
           "日本东京都涩谷区神宫前 1-14-23"
@@ -2180,7 +2190,7 @@ BوB Tokyo Jingumae Shop
         button: "من نحن",
         title: "من نحن",
         shopTitle: "المتجر",
-        shopLabels: ["مصر", "طوكيو"],
+        shopLabels: ["القاهرة", "طوكيو"],
         shopAddresses: [
           "١٢ ممر لوتس، الدرب الأحمر، القاهرة ١١٥١١، مصر",
           "١-١٤-٢٣ جينغومائه، شيبويا، طوكيو، اليابان"
@@ -2530,10 +2540,11 @@ BوB Tokyo Jingumae Shop
             changed = true;
             const isTerminalMark = node === textNodes[textNodes.length - 1] &&
               value.slice(pattern.lastIndex).trim() === "";
-            const beforeMark = value
-              .slice(cursor, match.index)
-              .replace(/^\s+/, "")
-              .replace(/\s+$/, "");
+            let beforeMark = value.slice(cursor, match.index);
+            if (cursor > 0) {
+              beforeMark = beforeMark.replace(/^\s+/, "");
+            }
+            beforeMark = beforeMark.replace(/\s+$/, "");
 
             if (beforeMark) {
               fragment.append(document.createTextNode(beforeMark));
